@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">TCC</string>
+    <string name="title_activity_maps_test">MapTest</string>
 </resources>
