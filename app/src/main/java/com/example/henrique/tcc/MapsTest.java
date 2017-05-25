@@ -1,8 +1,13 @@
 package com.example.henrique.tcc;
 
+import android.*;
+import android.Manifest;
 import android.app.Activity;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.widget.Button;
 
 /*import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,6 +26,8 @@ import org.osmdroid.views.overlay.Marker;
 
 public class MapsTest extends Activity{
 
+    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
     private MapView mMap;
     private MapController OsmC;
 
@@ -40,16 +47,100 @@ public class MapsTest extends Activity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
 
+        //Checando permissões
+
+        //Armazenamento, para as tiles poderem carregar
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+
+
+            } else {
+
+               ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
+
+
+            }
+        }
+
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+
+            } else {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+
+
+            }
+        }
+
+
+
+
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                        PrepareMap();
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
+    }
+
+    public void PrepareMap ()
+    {
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
         mMap.setBuiltInZoomControls(true);
         mMap.setMultiTouchControls(true);
         OsmC = (MapController)mMap.getController();
-        OsmC.setZoom(12);
+        OsmC.setZoom(100);
 
         GeoPoint start = new GeoPoint( -22.373122, -48.381831);
         OsmC.animateTo(start);
-
+        AddMarker(start);
     }
 
     public void AddMarker(GeoPoint ponto){
