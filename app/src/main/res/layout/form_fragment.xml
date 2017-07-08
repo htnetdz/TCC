@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:orientation="vertical"
+    android:visibility="visible"
+    android:id = "@+id/form_fragment">
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/problemDescriptor"
+        android:layout_width="match_parent"
+        android:layout_height="127dp">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Descreva o problema" />
+    </android.support.design.widget.TextInputLayout>
+
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Selecione o Tipo de Problema" />
+
+    <Spinner
+        android:id="@+id/seletorTipos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

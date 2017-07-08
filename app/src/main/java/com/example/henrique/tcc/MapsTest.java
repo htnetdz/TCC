@@ -24,7 +24,7 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
-public class MapsTest extends Activity{
+public class MapsTest extends FragmentActivity{
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
@@ -70,7 +70,7 @@ public class MapsTest extends Activity{
         }
 
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION)
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
@@ -87,10 +87,9 @@ public class MapsTest extends Activity{
 
             }
         }
-
-
-
-
+        else{
+            PrepareMap();
+        }
 
     }
 
@@ -152,6 +151,10 @@ public class MapsTest extends Activity{
         mMap.getOverlays().add(marcador);
         mMap.invalidate();
 
+    }
+
+    public void OnAddProblem (){
+        
     }
 
     /**
