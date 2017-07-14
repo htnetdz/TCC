@@ -1,31 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="300dp"
     android:orientation="vertical"
     android:visibility="visible"
-    android:id = "@+id/form_fragment">
+    android:id = "@+id/form_fragment"
+    android:weightSum="1"
+    android:backgroundTint="@android:color/holo_blue_dark">
 
-    <android.support.design.widget.TextInputLayout
-        android:id="@+id/problemDescriptor"
-        android:layout_width="match_parent"
-        android:layout_height="127dp">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Descreva o problema" />
-    </android.support.design.widget.TextInputLayout>
-
-    <EditText
-        android:id="@+id/editText"
+    <TextView
+        android:id="@+id/problemDescriptionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Selecione o Tipo de Problema" />
+        android:text="Descreva O Problema"
+        android:textAppearance="@android:style/TextAppearance.Material.Title"
+        android:backgroundTint="@android:color/holo_blue_dark"/>
+
+    <EditText
+        android:id="@+id/descriptionProblem"
+        style="@style/AppTheme"
+        android:layout_width="match_parent"
+        android:layout_height="116dp"
+        android:backgroundTint="@android:color/holo_blue_dark"/>
+
+    <TextView
+        android:id="@+id/problemTypeHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Escolha o tipo de problema"
+        android:textAppearance="@android:style/TextAppearance.Material.Title"
+        android:backgroundTint="@android:color/holo_blue_dark"/>
 
     <Spinner
-        android:id="@+id/seletorTipos"
+        android:id="@+id/selectorTypes"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_weight="0.18" />
 
 </LinearLayout>

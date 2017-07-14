@@ -3,11 +3,19 @@ package com.example.henrique.tcc;
 import android.*;
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 
 /*import com.google.android.gms.maps.CameraUpdateFactory;
@@ -18,11 +26,27 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;*/
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+
+import java.util.Arrays;
+import java.util.List;
+
 
 public class MapsTest extends FragmentActivity{
 
@@ -30,23 +54,24 @@ public class MapsTest extends FragmentActivity{
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
     private MapView mMap;
     private MapController OsmC;
+    private FusedLocationProviderClient locationClient;
+    private RequestQueue requestQueue;
+    private Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-       // Implementação em GoogleMapsAPI
-        /* super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps_test);
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);*/
 
         //Implementação em OpenStreetMaps
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
 
+        final Button addProblemButton = (Button) findViewById(R.id.addProblem);
+        addProblemButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick (View v){
+                OnAddProblem();
+            }
+        });
         //Checando permissões
 
         //Armazenamento, para as tiles poderem carregar
@@ -69,6 +94,7 @@ public class MapsTest extends FragmentActivity{
             }
         }
 
+
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -87,9 +113,15 @@ public class MapsTest extends FragmentActivity{
 
             }
         }
-        else{
+
+        else {
             PrepareMap();
         }
+        //Preparando a fila de requisições ao DB
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson= gsonBuilder.create();
+        requestQueue = Volley.newRequestQueue(this);
+        GetMarkersDB();
 
     }
 
@@ -101,7 +133,7 @@ public class MapsTest extends FragmentActivity{
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                        return;
                 } else {
 
                     // permission denied, boo! Disable the
@@ -112,7 +144,6 @@ public class MapsTest extends FragmentActivity{
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                         PrepareMap();
 
                 } else {
@@ -132,47 +163,93 @@ public class MapsTest extends FragmentActivity{
     {
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
-        mMap.setBuiltInZoomControls(true);
+        mMap.setBuiltInZoomControls(false);
         mMap.setMultiTouchControls(true);
         OsmC = (MapController)mMap.getController();
         OsmC.setZoom(100);
 
-        GeoPoint start = new GeoPoint( -22.373122, -48.381831);
-        OsmC.animateTo(start);
-        AddMarker(start);
+
+        GeoPoint startPoint = new GeoPoint(-22.346106, -49.034391);
+        OsmC.animateTo(startPoint);
+        AddMarker(startPoint);
     }
 
     public void AddMarker(GeoPoint ponto){
-        Marker marcador = new Marker(mMap);
-        marcador.setPosition(ponto);
-        marcador.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        Marker newMarker = new Marker(mMap);
+        newMarker.setPosition(ponto);
+        newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
         mMap.getOverlays().clear();
-        mMap.getOverlays().add(marcador);
+        mMap.getOverlays().add(newMarker);
         mMap.invalidate();
 
     }
 
-    public void OnAddProblem (){
-        
+    //Função que montará a string para fazer a consulta ao serviço
+    public void GetMarkersDB(){
+        //Montar a URL de consulta ao serviço
+        //Chamar a função fetchProblems, mandando o endpoint
+
+        /*String endpoint;
+        fetchProblems(endpoint);*/
+
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    /*@Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+    //Funcção que usará componentes do Volley para fazer um request ao serviço
+    private void fetchProblems(String endpoint){
+        //Método GET usado como exemplo, suporta outros
+        StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
+        requestQueue.add(request);
+    }
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-    }*/
+    //Callback de fetchProblems, caso dê tudo certo
+    private final Response.Listener<String> onProblemsLoaded = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+
+            /*Fazer parsing do JSON*/
+            /*chamar a função de adicionar marcador para cada ponto encotnrado*/
+            /*List<Problem> problems = Arrays.asList(gson.fromJson(response, Problem[].class));
+
+            for (Problem problem : problems) {
+            }  */
+        }
+    };
+
+    //Callback de fetchProblems, caso dê algo errado
+    private final Response.ErrorListener onFetchError = new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            Log.e("PostActivity", error.toString());
+        }
+    };
+
+    //Função chamada ao se pressionar o botão de adicionar problema no mapa
+    public void OnAddProblem (){
+
+        LayoutInflater layoutInflater = LayoutInflater.from(MapsTest.this);
+        View promptView = layoutInflater.inflate(R.layout.form_fragment, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsTest.this);
+        alertDialogBuilder.setView(promptView);
+
+        alertDialogBuilder.setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Os dados devem ser pegos aqui
+                        /*GeoPoint userMarker = new GeoPoint();*/
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("Cancelar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
+    }
+
 }
+
+

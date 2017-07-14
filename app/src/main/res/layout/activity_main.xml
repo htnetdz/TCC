@@ -15,19 +15,16 @@
         android:id="@+id/sample_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Bem Vindo ao GISUnesp" />
 
     <Button
-        android:text="Button"
+        android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/button3"
-        android:layout_marginLeft="43dp"
-        android:layout_marginStart="43dp"
-        android:layout_marginTop="68dp"
+        android:layout_marginTop="64dp"
+        android:text="Mostrar Mapa"
         android:layout_below="@+id/sample_text"
-        android:layout_toRightOf="@+id/sample_text"
-        android:layout_toEndOf="@+id/sample_text" />
+        android:layout_centerHorizontal="true" />
 
 
 
