@@ -243,6 +243,8 @@ public class MapsTest extends FragmentActivity{
     //Função chamada ao se pressionar o botão de adicionar problema no mapa
     public void OnAddProblem (){
 
+
+
         LayoutInflater layoutInflater = LayoutInflater.from(MapsTest.this);
         View promptView = layoutInflater.inflate(R.layout.form_fragment, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsTest.this);
