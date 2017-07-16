@@ -7,5 +7,11 @@ package com.example.henrique.tcc;
 import com.google.gson.annotations.SerializedName;
 
 public class Problem {
-
+    int usuario_id;
+    int tipo_problema_id;
+    String descricao;
+    boolean resolvido;
+    double lat;
+    double lon;
+    int id;
 }

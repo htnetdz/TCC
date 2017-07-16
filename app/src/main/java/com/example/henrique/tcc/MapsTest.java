@@ -37,6 +37,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -118,8 +122,11 @@ public class MapsTest extends FragmentActivity{
             PrepareMap();
         }
         //Preparando a fila de requisições ao DB
+        Log.i("Request", " antes do builder");
         GsonBuilder gsonBuilder = new GsonBuilder();
+        Log.i("Request", " depois do builder");
         gson= gsonBuilder.create();
+        Log.i("Request", " depois do create");
         requestQueue = Volley.newRequestQueue(this);
         GetMarkersDB();
 
@@ -169,17 +176,18 @@ public class MapsTest extends FragmentActivity{
         OsmC.setZoom(100);
 
 
-        GeoPoint startPoint = new GeoPoint(-22.346106, -49.034391);
+        GeoPoint startPoint = new GeoPoint(-22.346116, -49.034401);
         OsmC.animateTo(startPoint);
-        AddMarker(startPoint);
+        AddMarker(startPoint, "Voce");
     }
 
-    public void AddMarker(GeoPoint ponto){
+    public void AddMarker(GeoPoint ponto, String descricao){
         Marker newMarker = new Marker(mMap);
         newMarker.setPosition(ponto);
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        newMarker.setTitle(descricao);
 
-        mMap.getOverlays().clear();
+        /*mMap.getOverlays().clear();*/
         mMap.getOverlays().add(newMarker);
         mMap.invalidate();
 
@@ -189,9 +197,10 @@ public class MapsTest extends FragmentActivity{
     public void GetMarkersDB(){
         //Montar a URL de consulta ao serviço
         //Chamar a função fetchProblems, mandando o endpoint
-
-        /*String endpoint;
-        fetchProblems(endpoint);*/
+        Log.i("Request", "Dentro de get markers db");
+        String endpoint = "http://ae04f669.ngrok.io/api/problemas";
+        Log.i("Request", endpoint);
+        fetchProblems(endpoint);
 
     }
 
@@ -206,13 +215,20 @@ public class MapsTest extends FragmentActivity{
     private final Response.Listener<String> onProblemsLoaded = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
-
+            Log.i("resposta",response.toString());
+            GeoPoint point;
             /*Fazer parsing do JSON*/
-            /*chamar a função de adicionar marcador para cada ponto encotnrado*/
-            /*List<Problem> problems = Arrays.asList(gson.fromJson(response, Problem[].class));
-
+            JsonElement parsedResponse = new JsonParser().parse(response);
+            JsonObject dataObject = parsedResponse.getAsJsonObject();
+            JsonArray dataArray = dataObject.getAsJsonArray("data");
+            /*chamar a função de adicionar marcador para cada ponto encontrado*/
+            List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
+            Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
             for (Problem problem : problems) {
-            }  */
+                Log.d("problema", String.valueOf(problem.lat)+' '+String.valueOf(problem.lon)+ "\nDescrição " +problem.descricao);
+                point = new GeoPoint(problem.lat, problem.lon);
+                AddMarker(point, problem.descricao);
+            }
         }
     };
 
@@ -246,8 +262,8 @@ public class MapsTest extends FragmentActivity{
                                 dialog.cancel();
                             }
                         });
-        AlertDialog alert = alertDialogBuilder.create();
-        alert.show();
+        /*AlertDialog alert = alertDialogBuilder.create();
+        alert.show();*/
     }
 
 }
