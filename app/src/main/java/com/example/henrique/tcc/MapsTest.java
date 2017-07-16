@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
@@ -52,7 +53,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class MapsTest extends FragmentActivity{
+public class MapsTest extends FragmentActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
@@ -61,6 +62,8 @@ public class MapsTest extends FragmentActivity{
     private FusedLocationProviderClient locationClient;
     private RequestQueue requestQueue;
     private Gson gson;
+    private FusedLocationProviderClient mFusedLocationClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,10 +72,10 @@ public class MapsTest extends FragmentActivity{
         //Implementação em OpenStreetMaps
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
-
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         final Button addProblemButton = (Button) findViewById(R.id.addProblem);
-        addProblemButton.setOnClickListener(new View.OnClickListener(){
-            public void onClick (View v){
+        addProblemButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 OnAddProblem();
             }
         });
@@ -90,7 +93,7 @@ public class MapsTest extends FragmentActivity{
 
             } else {
 
-               ActivityCompat.requestPermissions(this,
+                ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
 
@@ -116,16 +119,14 @@ public class MapsTest extends FragmentActivity{
 
 
             }
-        }
-
-        else {
+        } else {
             PrepareMap();
         }
         //Preparando a fila de requisições ao DB
         Log.i("Request", " antes do builder");
         GsonBuilder gsonBuilder = new GsonBuilder();
         Log.i("Request", " depois do builder");
-        gson= gsonBuilder.create();
+        gson = gsonBuilder.create();
         Log.i("Request", " depois do create");
         requestQueue = Volley.newRequestQueue(this);
         GetMarkersDB();
@@ -140,7 +141,7 @@ public class MapsTest extends FragmentActivity{
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        return;
+                    return;
                 } else {
 
                     // permission denied, boo! Disable the
@@ -151,7 +152,7 @@ public class MapsTest extends FragmentActivity{
             case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                        PrepareMap();
+                    PrepareMap();
 
                 } else {
 
@@ -166,30 +167,54 @@ public class MapsTest extends FragmentActivity{
         }
     }
 
-    public void PrepareMap ()
-    {
+    public void PrepareMap() {
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
         mMap.setBuiltInZoomControls(false);
         mMap.setMultiTouchControls(true);
-        OsmC = (MapController)mMap.getController();
+        OsmC = (MapController) mMap.getController();
         OsmC.setZoom(100);
 
+        AddYou();
 
-        GeoPoint startPoint = new GeoPoint(-22.346116, -49.034401);
-        OsmC.animateTo(startPoint);
-        AddMarker(startPoint, "Voce");
     }
 
-    public void AddMarker(GeoPoint ponto, String descricao){
+    public void AddYou() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
+                            OsmC.animateTo(startPoint);
+                            AddMarker(startPoint, "You", 0);
+                        }
+                    }
+                });
+
+    }
+
+
+    public void AddMarker(GeoPoint ponto, String descricao, int index){
         Marker newMarker = new Marker(mMap);
         newMarker.setPosition(ponto);
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         newMarker.setTitle(descricao);
-
+        Resources res = getResources();
+        if (index == 0){
+            newMarker.setIcon(res.getDrawable(R.drawable.person));
+        }
+        else {
+            newMarker.setIcon(res.getDrawable(R.drawable.ic_place_black_24dp));
+        }
         /*mMap.getOverlays().clear();*/
-        mMap.getOverlays().add(newMarker);
+        mMap.getOverlays().add(index, newMarker);
         mMap.invalidate();
+
 
     }
 
@@ -221,14 +246,18 @@ public class MapsTest extends FragmentActivity{
             JsonElement parsedResponse = new JsonParser().parse(response);
             JsonObject dataObject = parsedResponse.getAsJsonObject();
             JsonArray dataArray = dataObject.getAsJsonArray("data");
+
             /*chamar a função de adicionar marcador para cada ponto encontrado*/
             List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
+            int index = 1;
             for (Problem problem : problems) {
                 Log.d("problema", String.valueOf(problem.lat)+' '+String.valueOf(problem.lon)+ "\nDescrição " +problem.descricao);
                 point = new GeoPoint(problem.lat, problem.lon);
-                AddMarker(point, problem.descricao);
+                AddMarker(point, problem.descricao, index);
+                index++;
             }
+            index = 1;
         }
     };
 
