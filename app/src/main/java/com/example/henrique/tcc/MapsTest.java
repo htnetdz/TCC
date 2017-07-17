@@ -229,7 +229,7 @@ public class MapsTest extends FragmentActivity {
         //Montar a URL de consulta ao serviço
         //Chamar a função fetchProblems, mandando o endpoint
         Log.i("Request", "Dentro de get markers db");
-        String endpoint = "http://ae04f669.ngrok.io/api/problemas";//ENDPOINT
+        String endpoint = "http://de36dd6d.ngrok.io/api/problemas";//ENDPOINT
         Log.i("Request", endpoint);
         fetchProblems(endpoint);
 
@@ -245,12 +245,13 @@ public class MapsTest extends FragmentActivity {
                     public void onSuccess(final Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            String endpoint = "http://ae04f669.ngrok.io/api/problema"; //ENDPOINT
+                            String endpoint = "http://de36dd6d.ngrok.io/api/problema"; //ENDPOINT
                             final Random r = new Random(); //REMOVER HARDCODE
                             StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
                                 @Override
                                 public void onResponse(String response) {
                                     Log.d("RESPOSTA POST", response.toString());
+                                    GetMarkersDB();
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
@@ -280,7 +281,7 @@ public class MapsTest extends FragmentActivity {
 
 
                             requestQueue.add(request);
-                            GetMarkersDB();
+
 
                         }
                     }
@@ -356,6 +357,7 @@ public class MapsTest extends FragmentActivity {
         alert.show();*/
 
         addProblemDB();
+
 
     }
 
