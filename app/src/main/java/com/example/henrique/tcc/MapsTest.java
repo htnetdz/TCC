@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -27,6 +28,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;*/
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -36,6 +38,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -50,7 +53,10 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 
 public class MapsTest extends FragmentActivity {
@@ -223,13 +229,67 @@ public class MapsTest extends FragmentActivity {
         //Montar a URL de consulta ao serviço
         //Chamar a função fetchProblems, mandando o endpoint
         Log.i("Request", "Dentro de get markers db");
-        String endpoint = "http://ae04f669.ngrok.io/api/problemas";
+        String endpoint = "http://ae04f669.ngrok.io/api/problemas";//ENDPOINT
         Log.i("Request", endpoint);
         fetchProblems(endpoint);
 
     }
 
-    //Funcção que usará componentes do Volley para fazer um request ao serviço
+    public void addProblemDB(){
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mFusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(final Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            String endpoint = "http://ae04f669.ngrok.io/api/problema"; //ENDPOINT
+                            final Random r = new Random(); //REMOVER HARDCODE
+                            StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.d("RESPOSTA POST", response.toString());
+                                }
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            }){
+                                @Override
+                                protected Map<String,String> getParams(){
+                                    Map<String,String> params = new HashMap<String, String>();
+                                    params.put("usuario_id","1");//REMOVER HARDCODE
+                                    params.put("tipo_problema_id","1");//REMOVER HARDCODE
+                                    params.put("descricao","descricao"+String.valueOf(r.nextInt())); //REMOVER HARDCODE
+                                    params.put("resolvido","false");
+                                    params.put("lat",String.valueOf(location.getLatitude()));
+                                    params.put("lon",String.valueOf(location.getLongitude()));
+                                    return params;
+                                }
+
+                                @Override
+                                public Map<String, String> getHeaders() throws AuthFailureError {
+                                    Map<String,String> params = new HashMap<String, String>();
+                                    params.put("Content-Type","application/x-www-form-urlencoded");
+                                    return params;
+                                }
+                            };
+
+
+                            requestQueue.add(request);
+                            GetMarkersDB();
+
+                        }
+                    }
+                });
+
+    }
+
+
+    //Função que usará componentes do Volley para fazer um request ao serviço
     private void fetchProblems(String endpoint){
         //Método GET usado como exemplo, suporta outros
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
@@ -257,7 +317,7 @@ public class MapsTest extends FragmentActivity {
                 AddMarker(point, problem.descricao, index);
                 index++;
             }
-            index = 1;
+
         }
     };
 
@@ -271,7 +331,6 @@ public class MapsTest extends FragmentActivity {
 
     //Função chamada ao se pressionar o botão de adicionar problema no mapa
     public void OnAddProblem (){
-
 
 
         LayoutInflater layoutInflater = LayoutInflater.from(MapsTest.this);
@@ -295,6 +354,9 @@ public class MapsTest extends FragmentActivity {
                         });
         /*AlertDialog alert = alertDialogBuilder.create();
         alert.show();*/
+
+        addProblemDB();
+
     }
 
 }
