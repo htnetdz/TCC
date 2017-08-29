@@ -13,24 +13,30 @@
         android:id="@+id/problemDescriptionHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:backgroundTint="@android:color/holo_blue_dark"
         android:text="Descreva O Problema"
-        android:textAppearance="@android:style/TextAppearance.Material.Title"
-        android:backgroundTint="@android:color/holo_blue_dark"/>
+        android:textAppearance="@android:style/TextAppearance.Material.Title" />
 
     <EditText
         android:id="@+id/descriptionProblem"
         style="@style/AppTheme"
         android:layout_width="match_parent"
         android:layout_height="116dp"
-        android:backgroundTint="@android:color/holo_blue_dark"/>
+        android:layout_margin="5sp"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:gravity="top|left"
+        android:hint="Aqui"
+        android:inputType="text" />
 
     <TextView
         android:id="@+id/problemTypeHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:backgroundTint="@android:color/holo_blue_dark"
         android:text="Escolha o tipo de problema"
-        android:textAppearance="@android:style/TextAppearance.Material.Title"
-        android:backgroundTint="@android:color/holo_blue_dark"/>
+        android:textAppearance="@android:style/TextAppearance.Material.Title" />
 
     <Spinner
         android:id="@+id/selectorTypes"

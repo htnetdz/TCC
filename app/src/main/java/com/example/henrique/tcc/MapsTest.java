@@ -4,12 +4,18 @@ import android.*;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
@@ -85,6 +91,7 @@ public class MapsTest extends FragmentActivity {
                 OnAddProblem();
             }
         });
+
         //Checando permissões
 
         //Armazenamento, para as tiles poderem carregar
@@ -126,6 +133,9 @@ public class MapsTest extends FragmentActivity {
 
             }
         } else {
+            //Checar se há internet ou GPS antes de tentar preparar o mapa
+            CheckConnections();
+            //Preparar o Mapa na Tela
             PrepareMap();
         }
         //Preparando a fila de requisições ao DB
@@ -171,6 +181,58 @@ public class MapsTest extends FragmentActivity {
             // other 'case' lines to check for other
             // permissions this app might request
         }
+    }
+
+    public void CheckConnections(){
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netStatus = manager.getActiveNetworkInfo();
+        if (netStatus == null)
+        {
+            //Diálogo Para Avisar o Usuário de falta de internet
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Sem Internet");
+            builder.setMessage("O Wifi parece estar desligado, é necessário ativar para que o mapa seja carregado");
+            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //Mostra as configurações para que o usuário possa habililtar o GPS
+                    Intent i = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                    startActivity(i);
+                }
+            });
+            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.create().show();
+        }
+
+        //Checando e pedindo por GPS
+        LocationManager gpsStatus = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //Diálogo para pedir GPS
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Falta de GPS");
+            builder.setMessage("O GPS parece estar desligado, é necessário ativar para que o mapa seja carregado");
+            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                   //Mostra as configurações para que o usuário possa habililtar o GPS
+                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
+            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.create().show();
+        }
+
     }
 
     public void PrepareMap() {
@@ -353,8 +415,8 @@ public class MapsTest extends FragmentActivity {
                                 dialog.cancel();
                             }
                         });
-        /*AlertDialog alert = alertDialogBuilder.create();
-        alert.show();*/
+        AlertDialog alert = alertDialogBuilder.create();
+        alert.show();
 
         addProblemDB();
 
