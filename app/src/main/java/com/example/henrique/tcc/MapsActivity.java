@@ -1,8 +1,6 @@
 package com.example.henrique.tcc;
 
-import android.*;
 import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,11 +11,8 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -25,6 +20,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 
 /*import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -44,7 +40,6 @@ import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -65,7 +60,7 @@ import java.util.Map;
 import java.util.Random;
 
 
-public class MapsTest extends FragmentActivity {
+public class MapsActivity extends FragmentActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
@@ -75,6 +70,7 @@ public class MapsTest extends FragmentActivity {
     private RequestQueue requestQueue;
     private Gson gson;
     private FusedLocationProviderClient mFusedLocationClient;
+
 
 
     @Override
@@ -297,7 +293,7 @@ public class MapsTest extends FragmentActivity {
 
     }
 
-    public void addProblemDB(){
+    public void addProblemDB(final Problem problemToAdd){
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -326,7 +322,7 @@ public class MapsTest extends FragmentActivity {
                                     Map<String,String> params = new HashMap<String, String>();
                                     params.put("usuario_id","1");//REMOVER HARDCODE
                                     params.put("tipo_problema_id","1");//REMOVER HARDCODE
-                                    params.put("descricao","descricao"+String.valueOf(r.nextInt())); //REMOVER HARDCODE
+                                    params.put("descricao",problemToAdd.descricao);
                                     params.put("resolvido","false");
                                     params.put("lat",String.valueOf(location.getLatitude()));
                                     params.put("lon",String.valueOf(location.getLongitude()));
@@ -396,9 +392,9 @@ public class MapsTest extends FragmentActivity {
     public void OnAddProblem (){
 
 
-        LayoutInflater layoutInflater = LayoutInflater.from(MapsTest.this);
-        View promptView = layoutInflater.inflate(R.layout.form_fragment, null);
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsTest.this);
+        LayoutInflater layoutInflater = LayoutInflater.from(MapsActivity.this);
+        final View promptView = layoutInflater.inflate(R.layout.form_fragment, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         alertDialogBuilder.setView(promptView);
 
         alertDialogBuilder.setCancelable(false)
@@ -406,7 +402,11 @@ public class MapsTest extends FragmentActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         //Os dados devem ser pegos aqui
                         /*GeoPoint userMarker = new GeoPoint();*/
-                        dialog.cancel();
+                        Problem newProblem = null;
+                        EditText descriptorField = (EditText) promptView.findViewById(R.id.descriptionProblem);
+                        newProblem.descricao = descriptorField.getText().toString();
+                        addProblemDB(newProblem);
+//                        dialog.cancel();
                     }
                 })
                 .setNegativeButton("Cancelar",
@@ -418,7 +418,7 @@ public class MapsTest extends FragmentActivity {
         AlertDialog alert = alertDialogBuilder.create();
         alert.show();
 
-        addProblemDB();
+
 
 
     }

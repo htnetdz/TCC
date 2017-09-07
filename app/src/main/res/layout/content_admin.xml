@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.henrique.tcc.AdminActivity"
+    tools:showIn="@layout/activity_admin">
+
+    <Button
+        android:id="@+id/sortByVoteButton"
+        android:layout_width="wrap_content"
+        android:text="Mais Votados"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="80dp"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/sortByOlderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mais Antigos"
+        tools:layout_editor_absoluteY="80dp"
+        app:layout_constraintLeft_toRightOf="@+id/sortByVoteButton"
+        android:layout_marginLeft="104dp"
+        android:layout_marginStart="104dp" />
+
+    <ListView
+        android:id="@+id/problemList"
+        android:layout_width="0dp"
+        android:layout_height="511dp"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_editor_absoluteY="150dp" />
+
+</android.support.constraint.ConstraintLayout>
