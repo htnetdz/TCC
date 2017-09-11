@@ -44,7 +44,7 @@ public class AdminActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
         //Instância da lista
-        ListView problemList = (ListView) findViewById(R.id.problemList);
+
 
 
         //Botão para organizar por melhor votados
@@ -62,19 +62,22 @@ public class AdminActivity extends AppCompatActivity {
                 BuildList("older");
             }
         });
-
+        requestQueue = Volley.newRequestQueue(this);
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson = gsonBuilder.create();
     }
 
     public void BuildList (String orderBy){
-
-        String endpoint;
+        ListView problemList = (ListView) findViewById(R.id.problemList);
+        problemList.setAdapter(null);
+        String endpoint = null;
         if (orderBy == "votes"){
-           // endpoint = /*INSERIR ENDPOINT AQUI*/;
+           endpoint = "http://173dd587.ngrok.io/api/problemas";
         }
         if (orderBy == "older"){
-            // endpoint = /*INSERIR ENDPOINT AQUI*/;
+            endpoint = "http://173dd587.ngrok.io/api/problemas";
         }
-        //fetchProblems(endpoint);
+        fetchProblems(endpoint);
     }
 
     private void fetchProblems(String endpoint){
@@ -96,11 +99,11 @@ public class AdminActivity extends AppCompatActivity {
 
             /*chamar a função de adicionar marcador para cada ponto encontrado*/
             List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
+            ListView problemList = (ListView) findViewById(R.id.problemList);
             ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(),0, problems);
-
-
-
-            Log.d("Lista de problemas", String.valueOf(problems));
+            problemList.setAdapter(adapter);
+            Log.d("Adapter status", adapter.toString());
+            Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
 
 
         }

@@ -2,19 +2,16 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/problemIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         app:srcCompat="@drawable/btn_moreinfo"
         android:layout_alignParentTop="true"
-        android:layout_toStartOf="@+id/textView6"
-        android:layout_marginBottom="463dp"
-        android:layout_alignParentBottom="true" />
+        android:layout_toLeftOf="@+id/problemDescription"
+        android:layout_toStartOf="@+id/problemDescription" />
 
     <TextView
         android:id="@+id/problemTitle"
@@ -32,7 +29,6 @@
         android:id="@+id/problemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/problemIcon"
         android:layout_alignLeft="@+id/problemTitle"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"

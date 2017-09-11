@@ -287,7 +287,7 @@ public class MapsActivity extends FragmentActivity {
         //Montar a URL de consulta ao serviço
         //Chamar a função fetchProblems, mandando o endpoint
         Log.i("Request", "Dentro de get markers db");
-        String endpoint = "http://de36dd6d.ngrok.io/api/problemas";//ENDPOINT
+        String endpoint = "http://173dd587.ngrok.io/api/problemas";//ENDPOINT
         Log.i("Request", endpoint);
         fetchProblems(endpoint);
 
@@ -303,8 +303,8 @@ public class MapsActivity extends FragmentActivity {
                     public void onSuccess(final Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            String endpoint = "http://de36dd6d.ngrok.io/api/problema"; //ENDPOINT
-                            final Random r = new Random(); //REMOVER HARDCODE
+                            String endpoint = "http://173dd587.ngrok.io/api/problema"; //ENDPOINT
+                            /*final Random r = new Random();*/ //REMOVER HARDCODE
                             StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
                                 @Override
                                 public void onResponse(String response) {
@@ -321,7 +321,7 @@ public class MapsActivity extends FragmentActivity {
                                 protected Map<String,String> getParams(){
                                     Map<String,String> params = new HashMap<String, String>();
                                     params.put("usuario_id","1");//REMOVER HARDCODE
-                                    params.put("tipo_problema_id","1");//REMOVER HARDCODE
+                                    params.put("tipo_problema_id", toString().valueOf(problemToAdd.tipo_problema_id));//REMOVER HARDCODE
                                     params.put("descricao",problemToAdd.descricao);
                                     params.put("resolvido","false");
                                     params.put("lat",String.valueOf(location.getLatitude()));
@@ -402,9 +402,11 @@ public class MapsActivity extends FragmentActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         //Os dados devem ser pegos aqui
                         /*GeoPoint userMarker = new GeoPoint();*/
-                        Problem newProblem = null;
+                        Problem newProblem = new Problem();
                         EditText descriptorField = (EditText) promptView.findViewById(R.id.descriptionProblem);
                         newProblem.descricao = descriptorField.getText().toString();
+                        Log.e("Descrição problema ", newProblem.descricao);
+                        newProblem.tipo_problema_id = 1;
                         addProblemDB(newProblem);
 //                        dialog.cancel();
                     }
