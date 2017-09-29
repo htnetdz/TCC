@@ -11,6 +11,15 @@
     android:visibility="visible"
     tools:context="com.example.henrique.tcc.MainActivity">
 
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fazer Login"
+        android:layout_below="@+id/sample_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="31dp" />
+
     <TextView
         android:id="@+id/sample_text"
         android:layout_width="wrap_content"
@@ -24,19 +33,19 @@
         android:id="@+id/mapButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/sample_text"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="64dp"
-        android:text="Mostrar Mapa" />
+        android:layout_marginTop="61dp"
+        android:text="Mostrar Mapa"
+        android:layout_below="@+id/loginButton"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/adminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="75dp"
+        android:text="Área do Administrador"
         android:layout_below="@+id/mapButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="51dp"
-        android:text="Área do Administrador" />
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

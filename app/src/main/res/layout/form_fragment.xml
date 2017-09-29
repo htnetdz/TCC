@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/form_fragment"
     android:layout_width="match_parent"
-    android:layout_height="300dp"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@android:color/holo_blue_dark"
     android:orientation="vertical"
     android:visibility="visible"
-    android:id = "@+id/form_fragment"
-    android:weightSum="1"
-    android:backgroundTint="@android:color/holo_blue_dark">
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/problemTitleHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:text="Insira um Título para o Problema"
+        android:textAppearance="@android:style/TextAppearance.Material.Title" />
+
+    <EditText
+        android:id="@+id/titleProblem"
+        style="@style/AppTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5sp"
+        android:backgroundTint="@android:color/holo_blue_dark"
+        android:gravity="top|left"
+        android:hint="Aqui"
+        android:inputType="text" />
 
     <TextView
         android:id="@+id/problemDescriptionHeader"
@@ -42,6 +61,6 @@
         android:id="@+id/selectorTypes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.18" />
+        android:layout_weight="0.35" />
 
 </LinearLayout>

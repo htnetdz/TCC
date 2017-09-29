@@ -255,7 +255,7 @@ public class MapsActivity extends FragmentActivity {
                         if (location != null) {
                             GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
                             OsmC.animateTo(startPoint);
-                            AddMarker(startPoint, "You", 0);
+                            AddMarker(startPoint, null, 0);
                         }
                     }
                 });
@@ -263,17 +263,27 @@ public class MapsActivity extends FragmentActivity {
     }
 
 
-    public void AddMarker(GeoPoint ponto, String descricao, int index){
-        Marker newMarker = new Marker(mMap);
+    public void AddMarker(GeoPoint ponto, Problem problemToMark, int index){
+       /* Marker newMarker = new Marker(mMap);*/
+        ProblemMarker newMarker = new ProblemMarker(mMap);
+
+        /*Populating the marker with information to pass*/
         newMarker.setPosition(ponto);
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        newMarker.setTitle(descricao);
+
+
         Resources res = getResources();
         if (index == 0){
             newMarker.setIcon(res.getDrawable(R.drawable.person));
         }
         else {
+            newMarker.setTitle(problemToMark.titulo);
+            newMarker.setInfoWindow(new ProblemDetails(mMap));
             newMarker.setIcon(res.getDrawable(R.drawable.ic_place_black_24dp));
+            newMarker.setProblemDescription(problemToMark.descricao);
+            newMarker.setVotesUp(problemToMark.votos_pos);
+            newMarker.setVotesDown(problemToMark.votos_neg);
+            newMarker.setProblemId(problemToMark.problema_id);
         }
         /*mMap.getOverlays().clear();*/
         mMap.getOverlays().add(index, newMarker);
@@ -287,7 +297,7 @@ public class MapsActivity extends FragmentActivity {
         //Montar a URL de consulta ao serviço
         //Chamar a função fetchProblems, mandando o endpoint
         Log.i("Request", "Dentro de get markers db");
-        String endpoint = "http://173dd587.ngrok.io/api/problemas";//ENDPOINT
+        String endpoint = "http://104.236.55.88:8000/api/problemas";//ENDPOINT
         Log.i("Request", endpoint);
         fetchProblems(endpoint);
 
@@ -303,7 +313,7 @@ public class MapsActivity extends FragmentActivity {
                     public void onSuccess(final Location location) {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
-                            String endpoint = "http://173dd587.ngrok.io/api/problema"; //ENDPOINT
+                            String endpoint = "http://104.236.55.88:8000/api/problema"; //ENDPOINT
                             /*final Random r = new Random();*/ //REMOVER HARDCODE
                             StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
                                 @Override
@@ -318,14 +328,16 @@ public class MapsActivity extends FragmentActivity {
                                 }
                             }){
                                 @Override
+                                //FALTAM CAMPOS
                                 protected Map<String,String> getParams(){
                                     Map<String,String> params = new HashMap<String, String>();
                                     params.put("usuario_id","1");//REMOVER HARDCODE
-                                    params.put("tipo_problema_id", toString().valueOf(problemToAdd.tipo_problema_id));//REMOVER HARDCODE
+                                    params.put("tipo_problema_id", toString().valueOf(problemToAdd.tipo_problema_id));
+                                    params.put("titulo", problemToAdd.titulo);
                                     params.put("descricao",problemToAdd.descricao);
                                     params.put("resolvido","false");
-                                    params.put("lat",String.valueOf(location.getLatitude()));
-                                    params.put("lon",String.valueOf(location.getLongitude()));
+                                    params.put("lat",String.valueOf(location.getLatitude())); //POSSÍVEIS MUDANÇAS
+                                    params.put("lon",String.valueOf(location.getLongitude()));//POSSÍVEIS MUDANÇAS
                                     return params;
                                 }
 
@@ -361,6 +373,7 @@ public class MapsActivity extends FragmentActivity {
         public void onResponse(String response) {
             Log.i("resposta",response.toString());
             GeoPoint point;
+
             /*Fazer parsing do JSON*/
             JsonElement parsedResponse = new JsonParser().parse(response);
             JsonObject dataObject = parsedResponse.getAsJsonObject();
@@ -370,11 +383,14 @@ public class MapsActivity extends FragmentActivity {
             List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
             int index = 1;
-            for (Problem problem : problems) {
-                Log.d("problema", String.valueOf(problem.lat)+' '+String.valueOf(problem.lon)+ "\nDescrição " +problem.descricao);
-                point = new GeoPoint(problem.lat, problem.lon);
-                AddMarker(point, problem.descricao, index);
-                index++;
+            if (!(problems.isEmpty())) {
+                for (Problem problem : problems) {
+
+                    Log.d("problema", String.valueOf(problem.lat) + ' ' + String.valueOf(problem.lon) + "\nDescrição " + problem.descricao);
+                    point = new GeoPoint(problem.lat, problem.lon);
+                    AddMarker(point, problem, index);
+                    index++;
+                }
             }
 
         }
@@ -403,10 +419,13 @@ public class MapsActivity extends FragmentActivity {
                         //Os dados devem ser pegos aqui
                         /*GeoPoint userMarker = new GeoPoint();*/
                         Problem newProblem = new Problem();
+                        EditText titleField = (EditText) promptView.findViewById(R.id.titleProblem);
+                        newProblem.titulo = titleField.getText().toString();
                         EditText descriptorField = (EditText) promptView.findViewById(R.id.descriptionProblem);
                         newProblem.descricao = descriptorField.getText().toString();
                         Log.e("Descrição problema ", newProblem.descricao);
                         newProblem.tipo_problema_id = 1;
+
                         addProblemDB(newProblem);
 //                        dialog.cancel();
                     }
