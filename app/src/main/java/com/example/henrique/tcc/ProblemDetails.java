@@ -7,6 +7,8 @@ import android.widget.TextView;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
 
+import static java.lang.String.valueOf;
+
 /**
  * Created by Henrique on 19/09/2017.
  */
@@ -24,9 +26,13 @@ public class ProblemDetails extends MarkerInfoWindow {
         attachedMarker = (ProblemMarker) item;
 
         TextView title = (TextView) (mView.findViewById(R.id.detailsTitle));
+        title.setText(attachedMarker.problemTitle);
         TextView description = (TextView) (mView.findViewById(R.id.detailsDescription));
+        description.setText(attachedMarker.problemDescription);
         TextView voteCountUp = (TextView) (mView.findViewById(R.id.detailsVotesUp));
+        voteCountUp.setText(String.valueOf(attachedMarker.votesUp));
         TextView voteCountDown = (TextView) (mView.findViewById(R.id.detailsVotesDown));
+        voteCountDown.setText(String.valueOf(attachedMarker.votesDown));
 
         if (attachedMarker != null){
             if (attachedMarker.problemTitle != null)
@@ -35,8 +41,8 @@ public class ProblemDetails extends MarkerInfoWindow {
             if (attachedMarker.problemDescription != null)
                 title.setText(attachedMarker.problemDescription);
 
-            voteCountUp.setText(String.valueOf(attachedMarker.votesUp));
-            voteCountDown.setText(String.valueOf(attachedMarker.votesDown));
+            voteCountUp.setText(valueOf(attachedMarker.votesUp));
+            voteCountDown.setText(valueOf(attachedMarker.votesDown));
 
         }
 

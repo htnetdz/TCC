@@ -19,8 +19,10 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 /*import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -57,7 +59,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 
 public class MapsActivity extends FragmentActivity {
@@ -84,7 +85,7 @@ public class MapsActivity extends FragmentActivity {
         final Button addProblemButton = (Button) findViewById(R.id.addProblem);
         addProblemButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                OnAddProblem();
+                onAddProblemClick();
             }
         });
 
@@ -275,15 +276,16 @@ public class MapsActivity extends FragmentActivity {
         Resources res = getResources();
         if (index == 0){
             newMarker.setIcon(res.getDrawable(R.drawable.person));
+            newMarker.setInfoWindow(null);
         }
         else {
-            newMarker.setTitle(problemToMark.titulo);
-            newMarker.setInfoWindow(new ProblemDetails(mMap));
+            newMarker.setProblemTitle(problemToMark.titulo);
             newMarker.setIcon(res.getDrawable(R.drawable.ic_place_black_24dp));
             newMarker.setProblemDescription(problemToMark.descricao);
             newMarker.setVotesUp(problemToMark.votos_pos);
             newMarker.setVotesDown(problemToMark.votos_neg);
             newMarker.setProblemId(problemToMark.problema_id);
+            newMarker.setInfoWindow(new ProblemDetails(mMap));
         }
         /*mMap.getOverlays().clear();*/
         mMap.getOverlays().add(index, newMarker);
@@ -405,13 +407,19 @@ public class MapsActivity extends FragmentActivity {
     };
 
     //Função chamada ao se pressionar o botão de adicionar problema no mapa
-    public void OnAddProblem (){
+    public void onAddProblemClick(){
 
 
         LayoutInflater layoutInflater = LayoutInflater.from(MapsActivity.this);
         final View promptView = layoutInflater.inflate(R.layout.form_fragment, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         alertDialogBuilder.setView(promptView);
+
+        final Spinner typeSpinner = (Spinner) promptView.findViewById(R.id.selectorTypes);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.problem_types_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        typeSpinner.setAdapter(adapter);
 
         alertDialogBuilder.setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -421,10 +429,11 @@ public class MapsActivity extends FragmentActivity {
                         Problem newProblem = new Problem();
                         EditText titleField = (EditText) promptView.findViewById(R.id.titleProblem);
                         newProblem.titulo = titleField.getText().toString();
+                        Log.d("titulo", newProblem.titulo);
                         EditText descriptorField = (EditText) promptView.findViewById(R.id.descriptionProblem);
                         newProblem.descricao = descriptorField.getText().toString();
-                        Log.e("Descrição problema ", newProblem.descricao);
-                        newProblem.tipo_problema_id = 1;
+                        Log.d("Descrição problema ", newProblem.descricao);
+                        newProblem.tipo_problema_id = (typeSpinner.getSelectedItemPosition())+1;
 
                         addProblemDB(newProblem);
 //                        dialog.cancel();
@@ -437,6 +446,7 @@ public class MapsActivity extends FragmentActivity {
                             }
                         });
         AlertDialog alert = alertDialogBuilder.create();
+
         alert.show();
 
 
