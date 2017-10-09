@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     loginResponse = new Bundle();
-    loginResponse.putString("UserName", null);
+    loginResponse.putString("UserId", null);
     loginResponse.putInt("UserType", 0);
 
     final Button loginButton = (Button) findViewById(R.id.loginButton);

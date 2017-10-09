@@ -72,10 +72,10 @@ public class AdminActivity extends AppCompatActivity {
         problemList.setAdapter(null);
         String endpoint = null;
         if (orderBy == "votes"){
-           endpoint = "http://104.236.55.88:8000/api/problemas";
+           endpoint = "http://104.236.55.88:8000/api/problemas?order_votos_pos=true";
         }
         if (orderBy == "older"){
-            endpoint = "http://104.236.55.88:8000/api/problemas";
+            endpoint = "http://104.236.55.88:8000/api/problemas?order_antigos=true";
         }
         fetchProblems(endpoint);
     }

@@ -15,7 +15,6 @@ public class ProblemMarker extends org.osmdroid.views.overlay.Marker {
     public ProblemMarker(MapView mapView) {
         super(mapView);
     }
-
     public String problemTitle;
     public String problemDescription;
     public int votesUp;

@@ -15,10 +15,11 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="82dp"
         android:text="Fazer Login"
-        android:layout_below="@+id/sample_text"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="31dp" />
+        android:visibility="invisible"
+        android:layout_below="@+id/adminButton"
+        android:layout_centerHorizontal="true" />
 
     <TextView
         android:id="@+id/sample_text"
@@ -33,10 +34,10 @@
         android:id="@+id/mapButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="61dp"
         android:text="Mostrar Mapa"
-        android:layout_below="@+id/loginButton"
-        android:layout_centerHorizontal="true" />
+        android:layout_below="@+id/sample_text"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="52dp" />
 
     <Button
         android:id="@+id/adminButton"

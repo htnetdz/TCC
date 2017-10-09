@@ -133,7 +133,7 @@ public class MapsActivity extends FragmentActivity {
             //Checar se há internet ou GPS antes de tentar preparar o mapa
             CheckConnections();
             //Preparar o Mapa na Tela
-            PrepareMap();
+
         }
         //Preparando a fila de requisições ao DB
         Log.i("Request", " antes do builder");
@@ -181,9 +181,35 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void CheckConnections(){
+
+        //Checando e pedindo por GPS
+        LocationManager gpsStatus = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            //Diálogo para pedir GPS
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Falta de GPS");
+            builder.setMessage("O GPS parece estar desligado, é necessário ativar para que o mapa seja carregado");
+            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    //Mostra as configurações para que o usuário possa habililtar o GPS
+                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(i);
+                }
+            });
+            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            });
+            builder.create().show();
+        }
+
+
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netStatus = manager.getActiveNetworkInfo();
-        if (netStatus == null)
+        if (netStatus == null || !(netStatus.isConnectedOrConnecting()))
         {
             //Diálogo Para Avisar o Usuário de falta de internet
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -206,33 +232,11 @@ public class MapsActivity extends FragmentActivity {
             builder.create().show();
         }
 
-        //Checando e pedindo por GPS
-        LocationManager gpsStatus = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //Diálogo para pedir GPS
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Falta de GPS");
-            builder.setMessage("O GPS parece estar desligado, é necessário ativar para que o mapa seja carregado");
-            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                   //Mostra as configurações para que o usuário possa habililtar o GPS
-                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(i);
-                }
-            });
-            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            builder.create().show();
-        }
-
+        PrepareMap();
     }
 
     public void PrepareMap() {
+
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
         mMap.setBuiltInZoomControls(false);
