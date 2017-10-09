@@ -19,11 +19,12 @@
         android:id="@+id/sortByOlderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mais Antigos"
-        tools:layout_editor_absoluteY="80dp"
-        app:layout_constraintLeft_toRightOf="@+id/sortByVoteButton"
         android:layout_marginLeft="104dp"
-        android:layout_marginStart="104dp" />
+        android:layout_marginStart="104dp"
+        android:text="Mais Antigos"
+        android:visibility="invisible"
+        app:layout_constraintLeft_toRightOf="@+id/sortByVoteButton"
+        tools:layout_editor_absoluteY="80dp" />
 
     <ListView
         android:id="@+id/problemList"
