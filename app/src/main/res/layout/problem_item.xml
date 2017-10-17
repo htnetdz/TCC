@@ -8,10 +8,11 @@
         android:id="@+id/problemIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/btn_moreinfo"
         android:layout_alignParentTop="true"
+        android:layout_marginRight="3sp"
         android:layout_toLeftOf="@+id/problemDescription"
-        android:layout_toStartOf="@+id/problemDescription" />
+        android:layout_toStartOf="@+id/problemDescription"
+        app:srcCompat="@drawable/btn_moreinfo" />
 
     <TextView
         android:id="@+id/problemTitle"

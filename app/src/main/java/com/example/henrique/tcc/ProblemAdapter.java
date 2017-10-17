@@ -36,9 +36,9 @@ public class ProblemAdapter extends ArrayAdapter<Problem> {
         TextView  problemDescription= (TextView) convertView.findViewById(R.id.problemDescription);
         ImageView problemIcon = (ImageView) convertView.findViewById(R.id.problemIcon);
         // Populate the data into the template view using the data object
-        problemTitle.setText(toString().valueOf(problem.problema_id));
+        problemTitle.setText(toString().valueOf(problem.titulo));
         problemDescription.setText(problem.descricao);
-        problemIcon.setImageResource(R.drawable.ic_local_movies_black_24dp);
+        problemIcon.setImageResource(R.drawable.ic_announcement_black_24dp);
         // Return the completed view to render on screen
         return convertView;
     }

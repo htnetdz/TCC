@@ -123,7 +123,7 @@ public class ProblemDetails extends MarkerInfoWindow {
             }
         }){
             @Override
-            //FALTAM CAMPOS
+
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
                 params.put("Content-Type","application/x-www-form-urlencoded");

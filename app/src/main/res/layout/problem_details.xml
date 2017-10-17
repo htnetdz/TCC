@@ -32,6 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/holo_green_light"
+            android:drawableLeft="@drawable/ic_thumb_up_black_24dp"
+
             android:text="Sim" />
 
         <TextView
@@ -63,6 +65,7 @@
             android:layout_width="84dp"
             android:layout_height="wrap_content"
             android:backgroundTint="@android:color/holo_red_light"
+            android:drawableRight="@drawable/ic_thumb_down_black_24dp"
             android:text="Não" />
 
     </LinearLayout>
