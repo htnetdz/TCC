@@ -1,9 +1,11 @@
 package com.example.henrique.tcc;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.infowindow.MarkerInfoWindow;
@@ -115,6 +117,12 @@ public class ProblemDetails extends MarkerInfoWindow {
                 final TextView voteCountDown = (TextView) (mView.findViewById(R.id.detailsVotesDown));
                 voteCountDown.setText(String.valueOf(updatedProblem[0].votos_neg));
 
+                Context context = getView().getContext();
+                CharSequence text = "Voto Computado!";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -126,16 +134,17 @@ public class ProblemDetails extends MarkerInfoWindow {
 
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
-                params.put("Content-Type","application/x-www-form-urlencoded");
+
                 params.put("usuario_id", "1");
                 params.put("tipo_confirmacao", toString().valueOf(voto));
+                Log.d("Parametros", params.toString());
                 return params;
             }
 
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();
-
+                params.put("Content-Type","application/x-www-form-urlencoded");
                 return params;
             }
         };
