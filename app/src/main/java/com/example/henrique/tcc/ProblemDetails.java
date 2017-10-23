@@ -1,6 +1,8 @@
 package com.example.henrique.tcc;
 
+import android.app.NotificationManager;
 import android.content.Context;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -151,6 +153,29 @@ public class ProblemDetails extends MarkerInfoWindow {
 
 
         requestQueue.add(request);
+
+        //Teste de notificação SEM INTENT REMOVER
+        String mensagem = "";
+        if (voto == 1) {
+            mensagem = "como positivo";
+        }
+        else if (voto == 2){
+            mensagem = "como negativo";
+        }
+        else if (voto == 3){
+            mensagem = "como resolvido";
+        }
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(getView().getContext())
+                        .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                        .setContentTitle("Confirmação")
+                        .setContentText("Seu relato foi votado "+mensagem+"!");
+        NotificationManager mNotificationManager =
+                (NotificationManager) getView().getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(1, mBuilder.build());
+
+
     }
 
 
