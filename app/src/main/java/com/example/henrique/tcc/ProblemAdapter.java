@@ -35,12 +35,23 @@ public class ProblemAdapter extends ArrayAdapter<Problem> {
         TextView problemTitle = (TextView) convertView.findViewById(R.id.problemTitle);
         TextView  problemDescription= (TextView) convertView.findViewById(R.id.problemDescription);
         ImageView problemIcon = (ImageView) convertView.findViewById(R.id.problemIcon);
+        TextView voteUpCounter = (TextView) convertView.findViewById(R.id.listVoteUpCount);
+        TextView voteDownCounter = (TextView) convertView.findViewById(R.id.listVotedDownCount);
+        ImageView thumbUpIcon = (ImageView) convertView.findViewById(R.id.thumbUp);
+        ImageView thumbDownIcon = (ImageView) convertView.findViewById(R.id.thumbDown);
+
         // Populate the data into the template view using the data object
         problemTitle.setText(toString().valueOf(problem.titulo));
         problemDescription.setText(problem.descricao);
         problemIcon.setImageResource(R.drawable.ic_announcement_black_24dp);
+        thumbUpIcon.setImageResource(R.drawable.ic_thumb_up_black_24dp);
+        thumbDownIcon.setImageResource(R.drawable.ic_thumb_down_black_24dp);
+        voteUpCounter.setText(toString().valueOf(problem.votos_pos));
+        voteDownCounter.setText(toString().valueOf(problem.votos_neg));
+
         // Return the completed view to render on screen
         return convertView;
     }
+
 
 }

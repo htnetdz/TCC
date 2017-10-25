@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="5sp">
+    android:layout_marginBottom="5sp"
+    android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+    android:backgroundTint="@color/wallet_dim_foreground_disabled_holo_dark">
 
     <ImageView
         android:id="@+id/problemIcon"
@@ -40,4 +43,57 @@
         android:layout_below="@+id/problemTitle"
         android:text="TextView"
         android:textSize="18sp" />
+
+    <ImageView
+        android:id="@+id/thumbUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/problemDescription"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_toLeftOf="@+id/listVoteUpCount"
+        android:layout_toStartOf="@+id/listVoteUpCount"
+        android:visibility="visible"
+        app:srcCompat="@drawable/ic_thumb_up_black_24dp" />
+
+    <ImageView
+        android:id="@+id/thumbDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/problemDescription"
+        android:layout_marginEnd="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_toLeftOf="@+id/listVotedDownCount"
+        android:layout_toStartOf="@+id/listVotedDownCount"
+        android:visibility="visible"
+        app:srcCompat="@drawable/ic_thumb_down_black_24dp" />
+
+    <TextView
+        android:id="@+id/listVotedDownCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/problemDescription"
+        android:text="TextView"
+        android:textAlignment="viewStart"
+        android:textColor="@android:color/holo_red_light"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/listVoteUpCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/problemDescription"
+        android:layout_marginEnd="21dp"
+        android:layout_marginRight="21dp"
+        android:layout_toLeftOf="@+id/thumbDown"
+        android:layout_toStartOf="@+id/thumbDown"
+        android:text="TextView"
+        android:textAlignment="viewStart"
+        android:textColor="@android:color/holo_green_light"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
 </RelativeLayout>

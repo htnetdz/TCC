@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -99,9 +100,16 @@ public class AdminActivity extends AppCompatActivity {
 
             /*chamar a função de adicionar marcador para cada ponto encontrado*/
             List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
-            ListView problemList = (ListView) findViewById(R.id.problemList);
+            final ListView problemList = (ListView) findViewById(R.id.problemList);
             ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(),0, problems);
             problemList.setAdapter(adapter);
+            problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Object listItem = problemList.getItemAtPosition(position);
+                }
+            });
+
             Log.d("Adapter status", adapter.toString());
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
 
