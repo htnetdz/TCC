@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     tools:context="com.example.henrique.tcc.AdminActivity">
 
-
     <include
         layout="@layout/content_admin"
         />

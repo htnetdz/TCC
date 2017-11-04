@@ -15,11 +15,11 @@
         android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="82dp"
+        android:layout_below="@+id/mapButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
         android:text="Fazer Login"
-        android:visibility="invisible"
-        android:layout_below="@+id/adminButton"
-        android:layout_centerHorizontal="true" />
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/sample_text"
@@ -43,10 +43,10 @@
         android:id="@+id/adminButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
         android:text="Área do Administrador"
-        android:layout_below="@+id/mapButton"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="46dp" />
 
 
 </RelativeLayout>

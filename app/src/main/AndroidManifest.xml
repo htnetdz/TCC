@@ -43,11 +43,11 @@
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
-       <!-- <meta-data
+        <!--
+            <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/facebook_app_id" />-->
-
-
+            android:value="@string/facebook_app_id" />
+        -->
 
         <activity
             android:name=".MapsActivity"
@@ -56,17 +56,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.henrique.tcc.MainActivity" />
         </activity>
-
         <activity
             android:name=".AdminActivity"
             android:label="@string/title_activity_admin"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.henrique.tcc.MainActivity" />
         </activity>
-        <!--<activity
+        <!--
+        <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name" />
@@ -81,11 +80,23 @@
 
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
-        </activity>-->
+        </activity>
+        -->
         <activity
             android:name=".LoginActivity"
-            android:label="@string/title_activity_login"></activity>
-        <service android:name=".UserNotification" />
+            android:label="@string/title_activity_login" />
+
+        <service
+            android:name=".UserNotificationJob"
+            android:permission="android.permission.BIND_JOB_SERVICE">
+        </service>
+
+        <activity
+            android:name=".UserRegistrationActivity"
+            android:label="Cadastrar Novo Usuário"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+
     </application>
 
 </manifest>

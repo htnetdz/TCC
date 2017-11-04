@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
-
 
 
 public class MainActivity extends AppCompatActivity {
@@ -33,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick (View v){
                 Intent i = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivityForResult (i, 1, loginResponse);
-                registerJob(loginResponse.getString("UserId"));
             }
         });
 
@@ -53,18 +50,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
 //    // Example of a call to a native method
 //    TextView tv = (TextView) findViewById(R.id.sample_text);
 //    tv.setText(stringFromJNI());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK){
+        super.onActivityResult(requestCode, resultCode, data);
+        registerJob(data.getStringExtra("UserId"));}
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void registerJob (String user){
         JobScheduler jobScheduler = (JobScheduler) getApplicationContext().getSystemService(JOB_SCHEDULER_SERVICE);
-        ComponentName componentName = new ComponentName(getApplicationContext(),UserNotification.class);
+        ComponentName componentName = new ComponentName(getApplicationContext(),UserNotificationJob.class);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             JobInfo jobInfo =  new JobInfo.Builder(1,componentName)
-                    .setMinimumLatency(1000)
                     .setPeriodic(180000)
                     .setBackoffCriteria(30000, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)

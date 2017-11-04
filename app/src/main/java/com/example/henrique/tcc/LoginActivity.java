@@ -3,6 +3,7 @@ package com.example.henrique.tcc;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -64,6 +65,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         // Set up the login form.
@@ -87,6 +89,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        Button signUpButton = (Button) findViewById(R.id.newUserButton);
+        signUpButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), UserRegistrationActivity.class);
+                startActivity (i);
             }
         });
 

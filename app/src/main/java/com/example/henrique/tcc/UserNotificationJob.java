@@ -14,7 +14,7 @@ import android.support.v4.app.NotificationCompat;
  */
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-public class UserNotification extends JobService {
+public class UserNotificationJob extends JobService {
 
     JobParameters params;
     CustomTask task;
@@ -43,7 +43,7 @@ public class UserNotification extends JobService {
         protected Void doInBackground(Void... params) {
             //Colocar trabalho no background aqui
 
-            //Teste de notificação SEM INTENT REMOVER
+            //Teste de notificação SEM INTENT
             /*String mensagem = "";
             if (voto == 1) {
                 mensagem = "como positivo";

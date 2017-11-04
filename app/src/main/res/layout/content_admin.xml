@@ -10,26 +10,26 @@
     <Button
         android:id="@+id/sortByVoteButton"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Mais Votados"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="80dp"
-        android:layout_height="wrap_content" />
+        tools:layout_editor_absoluteY="16dp" />
 
     <Button
         android:id="@+id/sortByOlderButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="104dp"
-        android:layout_marginStart="104dp"
         android:text="Mais Antigos"
         android:visibility="visible"
         app:layout_constraintLeft_toRightOf="@+id/sortByVoteButton"
-        tools:layout_editor_absoluteY="80dp" />
+        tools:layout_editor_absoluteY="16dp" />
 
     <ListView
         android:id="@+id/problemList"
+        android:paddingBottom="70dp"
         android:layout_width="0dp"
-        android:layout_height="511dp"
+        android:layout_height="wrap_content"
         android:layout_margin="8sp"
         android:layout_marginTop="8dp"
         app:layout_constraintHorizontal_bias="0.5"
