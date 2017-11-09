@@ -32,6 +32,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:drawableLeft="@drawable/ic_announcement_black_24dp"
-        android:text="Relatar Problema" />
+        android:text="Relatar Problema"
+        android:visibility="invisible" />
 
 </RelativeLayout>

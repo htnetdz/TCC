@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.location.Location;
@@ -71,18 +72,22 @@ public class MapsActivity extends FragmentActivity {
     private RequestQueue requestQueue;
     private Gson gson;
     private FusedLocationProviderClient mFusedLocationClient;
-
+    private int id;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
+        SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
+        id = settings.getInt("userId", 0);
         //Implementação em OpenStreetMaps
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         final Button addProblemButton = (Button) findViewById(R.id.addProblem);
+        if (id !=0){
+            addProblemButton.setVisibility(View.VISIBLE);
+        }
         addProblemButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 onAddProblemClick();
@@ -291,7 +296,7 @@ public class MapsActivity extends FragmentActivity {
             newMarker.setProblemId(problemToMark.problema_id);
             newMarker.setInfoWindow(new ProblemDetails(mMap));
         }
-        /*mMap.getOverlays().clear();*/
+       /* mMap.getOverlays().clear();*/
         mMap.getOverlays().add(index, newMarker);
         mMap.invalidate();
 
@@ -310,6 +315,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
     public void addProblemDB(final Problem problemToAdd){
+
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -334,10 +340,9 @@ public class MapsActivity extends FragmentActivity {
                                 }
                             }){
                                 @Override
-                                //FALTAM CAMPOS
                                 protected Map<String,String> getParams(){
                                     Map<String,String> params = new HashMap<String, String>();
-                                    params.put("usuario_id","1");//REMOVER HARDCODE
+                                    params.put("usuario_id", String.valueOf(id));
                                     params.put("tipo_problema_id", toString().valueOf(problemToAdd.tipo_problema_id));
                                     params.put("titulo", problemToAdd.titulo);
                                     params.put("descricao",problemToAdd.descricao);
@@ -368,7 +373,6 @@ public class MapsActivity extends FragmentActivity {
 
     //Função que usará componentes do Volley para fazer um request ao serviço
     private void fetchProblems(String endpoint){
-        //Método GET usado como exemplo, suporta outros
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
         requestQueue.add(request);
     }

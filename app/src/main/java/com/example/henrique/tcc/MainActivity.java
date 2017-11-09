@@ -5,34 +5,52 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 
 public class MainActivity extends AppCompatActivity {
 
-    private Bundle loginResponse;
+    private SharedPreferences settings;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    loginResponse = new Bundle();
-    loginResponse.putString("UserId", null);
-    loginResponse.putInt("UserType", 0);
+        settings = getSharedPreferences("gisUnespSettings", 0);
+        TextView topText = (TextView) findViewById(R.id.sample_text);
+        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
 
-    final Button loginButton = (Button) findViewById(R.id.loginButton);
-        loginButton.setOnClickListener(new View.OnClickListener(){
+        Button loginButton = (Button) findViewById(R.id.loginButton);
+        if (settings.getInt("userId", 0) == 0){
+
+            loginButton.setText("Log In");
+            loginButton.setOnClickListener(new View.OnClickListener(){
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             public void onClick (View v){
                 Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-                startActivityForResult (i, 1, loginResponse);
+                startActivityForResult (i,1);
             }
-        });
+            });
+
+        }
+        else{
+            loginButton.setText("Log Out");
+            loginButton.setOnClickListener(new View.OnClickListener(){
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                public void onClick (View v){
+                    logOutUiChanges();
+                }
+            });
+        }
 
     final Button mapButton = (Button) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener(){
@@ -59,24 +77,63 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK){
         super.onActivityResult(requestCode, resultCode, data);
-        registerJob(data.getStringExtra("UserId"));}
+        if (resultCode == RESULT_OK){
+            logInUiChanges();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public void registerJob (String user){
+    public void registerJob (int user){
+        if (user != 0){
         JobScheduler jobScheduler = (JobScheduler) getApplicationContext().getSystemService(JOB_SCHEDULER_SERVICE);
         ComponentName componentName = new ComponentName(getApplicationContext(),UserNotificationJob.class);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+
             JobInfo jobInfo =  new JobInfo.Builder(1,componentName)
-                    .setPeriodic(180000)
+                    /*.setPeriodic(180000)*/
+                    .setPeriodic(60000)
                     .setBackoffCriteria(30000, JobInfo.BACKOFF_POLICY_EXPONENTIAL)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
             jobScheduler.schedule(jobInfo);
-
+            }
         }
+    }
+
+    public void logInUiChanges(){
+        Button loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setText("Log Out");
+
+        loginButton.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            public void onClick (View v){
+                logOutUiChanges();
+            }
+        });
+        TextView topText = (TextView) findViewById(R.id.sample_text);
+        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
+    }
+
+    public void logOutUiChanges(){
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("userName", null);
+        editor.putInt("userId", 0);
+        editor.commit();
+
+        TextView topText = (TextView) findViewById(R.id.sample_text);
+        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
+
+
+        Button loginButton = (Button) findViewById(R.id.loginButton);
+        loginButton.setText("Log In");
+        loginButton.setOnClickListener(new View.OnClickListener(){
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            public void onClick (View v){
+                Intent i = new Intent(getApplicationContext(), LoginActivity.class);
+                startActivityForResult (i, 1);
+            }
+        });
     }
 
     /**

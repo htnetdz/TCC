@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.AsyncTask;
 import android.support.annotation.RequiresApi;
@@ -42,6 +43,8 @@ public class UserNotificationJob extends JobService {
         @Override
         protected Void doInBackground(Void... params) {
             //Colocar trabalho no background aqui
+            /*SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
+            String userIdentification = String.valueOf(settings.getInt("userId",0));*/
 
             //Teste de notificação SEM INTENT
             /*String mensagem = "";

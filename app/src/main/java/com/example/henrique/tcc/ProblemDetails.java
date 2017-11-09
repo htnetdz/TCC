@@ -2,6 +2,7 @@ package com.example.henrique.tcc;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.View;
@@ -45,10 +46,11 @@ public class ProblemDetails extends MarkerInfoWindow {
         super(R.layout.problem_details, mapView);
     }
 
+    private SharedPreferences settings;
     @Override
     public void onOpen(Object item){
         attachedMarker = (ProblemMarker) item;
-
+        settings = getView().getContext().getSharedPreferences("gisUnespSettings", 0);
         TextView title = (TextView) (mView.findViewById(R.id.detailsTitle));
         title.setText(attachedMarker.problemTitle);
         TextView description = (TextView) (mView.findViewById(R.id.detailsDescription));
@@ -81,6 +83,21 @@ public class ProblemDetails extends MarkerInfoWindow {
 
         Button voteUp = (Button) (mView.findViewById(R.id.detailsVoteUpButton));
         Button voteDown = (Button) (mView.findViewById(R.id.detailsVoteDownButton));
+        TextView voteCountYes = (TextView) (mView.findViewById(R.id.detailsVotesUp));
+        TextView voteCountNo = (TextView) (mView.findViewById(R.id.detailsVotesDown));
+
+        if (settings.getInt("userId",0) == 0){
+            voteUp.setVisibility(View.INVISIBLE);
+            voteDown.setVisibility(View.INVISIBLE);
+            voteCountYes.setVisibility(View.INVISIBLE);
+            voteCountNo.setVisibility(View.INVISIBLE);
+        }
+        else{
+            voteUp.setVisibility(View.VISIBLE);
+            voteDown.setVisibility(View.VISIBLE);
+            voteCountYes.setVisibility(View.VISIBLE);
+            voteCountNo.setVisibility(View.VISIBLE);
+        }
 
         voteUp.setOnClickListener(new View.OnClickListener(){
 
@@ -103,7 +120,7 @@ public class ProblemDetails extends MarkerInfoWindow {
     }
 
     public void mandarVoto (final int voto, String endpoint){
-
+        final SharedPreferences settings = getView().getContext().getSharedPreferences("gisUnespSettings", 0);
         StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
@@ -137,7 +154,7 @@ public class ProblemDetails extends MarkerInfoWindow {
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
 
-                params.put("usuario_id", "1");
+                params.put("usuario_id", String.valueOf(settings.getInt("userId", 0)));
                 params.put("tipo_confirmacao", toString().valueOf(voto));
                 Log.d("Parametros", params.toString());
                 return params;
@@ -146,7 +163,8 @@ public class ProblemDetails extends MarkerInfoWindow {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();
-                params.put("Content-Type","application/x-www-form-urlencoded");
+                params.put("Accept","application/json");
+                params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
                 return params;
             }
         };
