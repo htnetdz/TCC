@@ -361,12 +361,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     JsonObject dataObject = parsedResponse.getAsJsonObject();
                     JsonObject dataArray  = dataObject.getAsJsonObject("data");
                     JsonObject userInfo = dataArray.getAsJsonObject("user_info");
-                    JsonObject userTokens = dataArray.getAsJsonObject("user_auth_info");
+
 
                     UserInfo loggedUser = gson.fromJson(userInfo, UserInfo.class);
-                    UserAuthInfo userToken = gson.fromJson(userTokens, UserAuthInfo.class);
                     Log.d("logged User", String.valueOf(loggedUser));
-                    Log.d("tokens", String.valueOf(userTokens));
+
 
                     SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
                     SharedPreferences.Editor editor = settings.edit();
@@ -374,8 +373,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     editor.putString("userName", loggedUser.name);
                     Log.d("User ID", String.valueOf(loggedUser.id));
 
-                    editor.putInt("userType", 0);
-                    editor.putString("userToken", userToken.access_token);
+                    editor.putString("userType",loggedUser.tipo);
+                    editor.putString("userToken", loggedUser.access_token);
                     editor.commit();
                     Log.d("User Preference",String.valueOf(settings.getInt("userId",0)));
                 }

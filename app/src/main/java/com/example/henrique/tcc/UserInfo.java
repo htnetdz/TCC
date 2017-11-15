@@ -8,6 +8,6 @@ public class UserInfo {
     int id;
     String name;
     String email;
-    String created_at;
-    String updated_at;
+    String tipo;
+    String access_token;
 }
