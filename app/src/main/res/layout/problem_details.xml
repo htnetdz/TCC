@@ -46,9 +46,15 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
-        <View
-            android:layout_width="61dp"
-            android:layout_height="match_parent" />
+        <Button
+            android:id="@+id/resolver_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
+            android:text="Resolvido!"
+            android:textAlignment="center"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/detailsVotesDown"

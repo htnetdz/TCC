@@ -1,5 +1,6 @@
 package com.example.henrique.tcc;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -9,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -68,6 +70,13 @@ public class UserRegistrationActivity extends AppCompatActivity {
             @Override
             public void onResponse(String response) {
                 Log.d("RESPOSTA SIGNUP", response.toString());
+                Context context = getApplicationContext();
+                CharSequence text = "Usuário Cadastrado!";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+                clearForm();
             }
         }, new Response.ErrorListener() {
             @Override
@@ -94,6 +103,21 @@ public class UserRegistrationActivity extends AppCompatActivity {
             }
         };
         requestQueue.add(request);
+
+    }
+
+    public void clearForm(){
+        TextView userNameField = (TextView) findViewById(R.id.userNameField);
+        TextView realNameField = (TextView) findViewById(R.id.realNameField);
+        TextView emailField = (TextView) findViewById(R.id.emailField);
+        TextView newPassField = (TextView) findViewById(R.id.newPassField);
+        TextView repeatPassField = (TextView) findViewById(R.id.repeatPassField);
+
+        userNameField.setText("");
+        realNameField.setText("");
+        emailField.setText("");
+        newPassField.setText("");
+        repeatPassField.setText("");
     }
 
 }

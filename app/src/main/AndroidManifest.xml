@@ -88,15 +88,21 @@
 
         <service
             android:name=".UserNotificationJob"
-            android:permission="android.permission.BIND_JOB_SERVICE">
-        </service>
+            android:permission="android.permission.BIND_JOB_SERVICE"></service>
 
         <activity
             android:name=".UserRegistrationActivity"
             android:label="Cadastrar Novo Usuário"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-
-
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".UserListActivity"
+            android:label="@string/title_activity_user_list"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.henrique.tcc.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

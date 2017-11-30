@@ -9,6 +9,29 @@ import android.os.Build;
 import android.os.AsyncTask;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Henrique on 23/10/2017.
@@ -19,42 +42,104 @@ public class UserNotificationJob extends JobService {
 
     JobParameters params;
     CustomTask task;
+    private RequestQueue requestQueue;
+    private Gson gson;
 
     @Override
     public boolean onStartJob(JobParameters params) {
+        Log.d("RUNNING JOB", params.toString());
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson = gsonBuilder.create();
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
         task = new CustomTask();
         task.execute();
-        return false;
+        return true;
     }
 
     @Override
     public boolean onStopJob(JobParameters params) {
-        return false;
+        return true;
     }
+
 
     private class CustomTask extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected void onPostExecute (Void aVoid){
-            jobFinished(params, false);
+            jobFinished(params, true);
             super.onPostExecute(aVoid);
         }
 
         @Override
         protected Void doInBackground(Void... params) {
             //Colocar trabalho no background aqui
-            /*SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
-            String userIdentification = String.valueOf(settings.getInt("userId",0));*/
+            Log.d("INSIDE BG TASK", params.toString());
+            SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
+            final String userIdentification;
+
+
+            userIdentification = "Bearer"+" "+settings.getString("userToken", "");
+            getNotifications(userIdentification);
+
+            return null;
+        }
+
+        private final Response.Listener<String> onNotifsLoaded = new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+                Log.i("notifResponse", response);
+                JsonElement parsedResponse = new JsonParser().parse(response);
+                JsonObject dataObject = parsedResponse.getAsJsonObject();
+                JsonArray notificationJSON = dataObject.getAsJsonArray("data");
+
+                List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
+
+                if (unreadNotifications.isEmpty() == false){
+                    for (NotificationObject notificationToProcess : unreadNotifications){
+                        notifyUser(notificationToProcess);
+                    }
+                }
+            }
+        };
+
+        private final Response.ErrorListener onFetchError = new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("PostActivity", error.toString());
+            }
+        };
+
+        protected void getNotifications (final String user){
+
+            Log.i("insideGetnotif", "user");
+            String endpoint = "http://104.236.55.88:8000/api/usuario/notificacoes";
+
+            GsonBuilder gsonBuilder = new GsonBuilder();
+            gson = gsonBuilder.create();
+            requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+            StringRequest requestGet = new StringRequest(Request.Method.GET, endpoint, onNotifsLoaded, onFetchError);
+            requestQueue.add(requestGet);
+
+
+
+        }
+
+        protected void notifyUser (NotificationObject notification){
+
+            Log.i("insideNotify", notification.toString());
+            int tipoVoto = notification.data.tipo_confirmacao;
 
             //Teste de notificação SEM INTENT
-            /*String mensagem = "";
-            if (voto == 1) {
+            String mensagem = "";
+            if (tipoVoto == 1) {
                 mensagem = "como positivo";
             }
-            else if (voto == 2){
+            else if (tipoVoto == 2){
                 mensagem = "como negativo";
             }
-            else if (voto == 3){
+            else if (tipoVoto == 3){
                 mensagem = "como resolvido";
             }
 
@@ -65,8 +150,17 @@ public class UserNotificationJob extends JobService {
                             .setContentText("Seu relato foi votado "+mensagem+"!");
             NotificationManager mNotificationManager =
                     (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.notify(1, mBuilder.build());
+
+
+            /*NotificationCompat.Builder mBuilder =
+                    new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
+                            .setContentTitle("Confirmação")
+                            .setContentText("Seu relato foi votado!");
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(1, mBuilder.build());*/
-            return null;
         }
     }
 }

@@ -3,6 +3,7 @@ package com.example.henrique.tcc;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -225,12 +226,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     }
 
     private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
+
         return email.contains("@");
     }
 
     private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
+
         return password.length() > 4;
     }
 
@@ -340,7 +341,6 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mPassword = password;
             GsonBuilder gsonBuilder = new GsonBuilder();
             gson = gsonBuilder.create();
-            Log.i("Request", " depois do create");
             requestQueue = Volley.newRequestQueue(getApplicationContext());
 
         }
@@ -356,27 +356,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onResponse(String response) {
 
-                    Log.d("RESPOSTA LOGIN", response.toString());
+                    Log.d("fantasy", response.toString());
                     JsonElement parsedResponse = new JsonParser().parse(response);
                     JsonObject dataObject = parsedResponse.getAsJsonObject();
                     JsonObject dataArray  = dataObject.getAsJsonObject("data");
-                    JsonObject userInfo = dataArray.getAsJsonObject("user_info");
 
-
-                    UserInfo loggedUser = gson.fromJson(userInfo, UserInfo.class);
-                    Log.d("logged User", String.valueOf(loggedUser));
-
-
+                    UserInfo loggedUser = gson.fromJson(dataArray, UserInfo.class);
+                    Log.d("USER INFO", loggedUser.toString());
                     SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
                     SharedPreferences.Editor editor = settings.edit();
                     editor.putInt("userId", loggedUser.id);
                     editor.putString("userName", loggedUser.name);
-                    Log.d("User ID", String.valueOf(loggedUser.id));
-
                     editor.putString("userType",loggedUser.tipo);
                     editor.putString("userToken", loggedUser.access_token);
                     editor.commit();
-                    Log.d("User Preference",String.valueOf(settings.getInt("userId",0)));
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -421,7 +414,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                setResult(RESULT_OK);
+                setResult(Activity.RESULT_OK);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

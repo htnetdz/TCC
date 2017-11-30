@@ -73,17 +73,17 @@ public class MapsActivity extends FragmentActivity {
     private Gson gson;
     private FusedLocationProviderClient mFusedLocationClient;
     private int id;
-
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
+        settings = getSharedPreferences("gisUnespSettings", 0);
         id = settings.getInt("userId", 0);
         //Implementação em OpenStreetMaps
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
         final Button addProblemButton = (Button) findViewById(R.id.addProblem);
         if (id !=0){
             addProblemButton.setVisibility(View.VISIBLE);
@@ -94,52 +94,8 @@ public class MapsActivity extends FragmentActivity {
             }
         });
 
-        //Checando permissões
-
-        //Armazenamento, para as tiles poderem carregar
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
 
-            } else {
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE);
-
-
-            }
-        }
-
-
-        if (ContextCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-
-            } else {
-
-                ActivityCompat.requestPermissions(this,
-                        new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-
-
-            }
-        } else {
-            //Checar se há internet ou GPS antes de tentar preparar o mapa
-            CheckConnections();
-            //Preparar o Mapa na Tela
-
-        }
         //Preparando a fila de requisições ao DB
         Log.i("Request", " antes do builder");
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -147,7 +103,8 @@ public class MapsActivity extends FragmentActivity {
         gson = gsonBuilder.create();
         Log.i("Request", " depois do create");
         requestQueue = Volley.newRequestQueue(this);
-        GetMarkersDB();
+        PrepareMap();
+
 
     }
 
@@ -187,8 +144,12 @@ public class MapsActivity extends FragmentActivity {
 
     public void CheckConnections(){
 
-        //Checando e pedindo por GPS
+
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netStatus = manager.getActiveNetworkInfo();
         LocationManager gpsStatus = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+
+        //Checando e pedindo por GPS
         if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             //Diálogo para pedir GPS
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -212,9 +173,8 @@ public class MapsActivity extends FragmentActivity {
         }
 
 
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netStatus = manager.getActiveNetworkInfo();
-        if (netStatus == null || !(netStatus.isConnectedOrConnecting()))
+
+        else if(netStatus == null || !(netStatus.isConnectedOrConnecting()))
         {
             //Diálogo Para Avisar o Usuário de falta de internet
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -237,11 +197,12 @@ public class MapsActivity extends FragmentActivity {
             builder.create().show();
         }
 
-        PrepareMap();
+
     }
 
     public void PrepareMap() {
 
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
         mMap.setBuiltInZoomControls(false);
@@ -250,7 +211,7 @@ public class MapsActivity extends FragmentActivity {
         OsmC.setZoom(100);
 
         AddYou();
-
+        GetMarkersDB();
     }
 
     public void AddYou() {
@@ -326,7 +287,7 @@ public class MapsActivity extends FragmentActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             String endpoint = "http://104.236.55.88:8000/api/problema"; //ENDPOINT
-                            /*final Random r = new Random();*/ //REMOVER HARDCODE
+
                             StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
                                 @Override
                                 public void onResponse(String response) {
@@ -355,11 +316,11 @@ public class MapsActivity extends FragmentActivity {
                                 @Override
                                 public Map<String, String> getHeaders() throws AuthFailureError {
                                     Map<String,String> params = new HashMap<String, String>();
-                                    params.put("Content-Type","application/x-www-form-urlencoded");
+                                    params.put("Accept","application/json");
+                                    params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
                                     return params;
                                 }
                             };
-
 
                             requestQueue.add(request);
 

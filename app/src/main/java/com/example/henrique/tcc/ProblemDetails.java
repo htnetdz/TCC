@@ -60,6 +60,7 @@ public class ProblemDetails extends MarkerInfoWindow {
         final TextView voteCountDown = (TextView) (mView.findViewById(R.id.detailsVotesDown));
         voteCountDown.setText(String.valueOf(attachedMarker.votesDown));
 
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
         requestQueue = Volley.newRequestQueue(getView().getContext());
@@ -83,20 +84,33 @@ public class ProblemDetails extends MarkerInfoWindow {
 
         Button voteUp = (Button) (mView.findViewById(R.id.detailsVoteUpButton));
         Button voteDown = (Button) (mView.findViewById(R.id.detailsVoteDownButton));
+        Button solvedBtn = (Button) (mView.findViewById(R.id.resolver_button));
         TextView voteCountYes = (TextView) (mView.findViewById(R.id.detailsVotesUp));
         TextView voteCountNo = (TextView) (mView.findViewById(R.id.detailsVotesDown));
 
         if (settings.getInt("userId",0) == 0){
-            voteUp.setVisibility(View.INVISIBLE);
-            voteDown.setVisibility(View.INVISIBLE);
-            voteCountYes.setVisibility(View.INVISIBLE);
-            voteCountNo.setVisibility(View.INVISIBLE);
+           voteUp.setVisibility(View.INVISIBLE);
+           voteDown.setVisibility(View.INVISIBLE);
+           voteCountYes.setVisibility(View.INVISIBLE);
+           voteCountNo.setVisibility(View.INVISIBLE);
+           solvedBtn.setVisibility(View.INVISIBLE);
         }
         else{
-            voteUp.setVisibility(View.VISIBLE);
-            voteDown.setVisibility(View.VISIBLE);
-            voteCountYes.setVisibility(View.VISIBLE);
-            voteCountNo.setVisibility(View.VISIBLE);
+            if (settings.getString("userType", "").equals("comum")) {
+                voteUp.setVisibility(View.VISIBLE);
+                voteDown.setVisibility(View.VISIBLE);
+                voteCountYes.setVisibility(View.VISIBLE);
+                voteCountNo.setVisibility(View.VISIBLE);
+                solvedBtn.setVisibility(View.INVISIBLE);
+            }
+            else{
+                voteUp.setVisibility(View.INVISIBLE);
+                voteDown.setVisibility(View.INVISIBLE);
+                voteCountYes.setVisibility(View.VISIBLE);
+                voteCountNo.setVisibility(View.VISIBLE);
+                solvedBtn.setVisibility(View.VISIBLE);
+            }
+
         }
 
         voteUp.setOnClickListener(new View.OnClickListener(){
@@ -116,6 +130,13 @@ public class ProblemDetails extends MarkerInfoWindow {
             }
         });
 
+        solvedBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mandarVoto(3, endpoint);
+            }
+        });
+
 
     }
 
@@ -124,7 +145,7 @@ public class ProblemDetails extends MarkerInfoWindow {
         StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
-                Log.d("RESPOSTA POST", response.toString());
+
 
                 JsonElement parsedResponse = new JsonParser().parse(response);
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
@@ -154,9 +175,8 @@ public class ProblemDetails extends MarkerInfoWindow {
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
 
-                params.put("usuario_id", String.valueOf(settings.getInt("userId", 0)));
                 params.put("tipo_confirmacao", toString().valueOf(voto));
-                Log.d("Parametros", params.toString());
+
                 return params;
             }
 
