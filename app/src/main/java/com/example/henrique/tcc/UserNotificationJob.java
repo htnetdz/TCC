@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -44,9 +46,11 @@ public class UserNotificationJob extends JobService {
     CustomTask task;
     private RequestQueue requestQueue;
     private Gson gson;
+    private SharedPreferences settings;
 
     @Override
     public boolean onStartJob(JobParameters params) {
+        this.params = params;
         Log.d("RUNNING JOB", params.toString());
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
@@ -89,15 +93,20 @@ public class UserNotificationJob extends JobService {
             public void onResponse(String response) {
 
                 Log.i("notifResponse", response);
+                JsonArray notificationJSON = null;
                 JsonElement parsedResponse = new JsonParser().parse(response);
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
-                JsonArray notificationJSON = dataObject.getAsJsonArray("data");
 
-                List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
+                if (dataObject.isJsonArray()) {
+                    notificationJSON = dataObject.getAsJsonArray("data");
 
-                if (unreadNotifications.isEmpty() == false){
-                    for (NotificationObject notificationToProcess : unreadNotifications){
-                        notifyUser(notificationToProcess);
+
+                    List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
+
+                    if (unreadNotifications.isEmpty() == false) {
+                        for (NotificationObject notificationToProcess : unreadNotifications) {
+                            notifyUser(notificationToProcess);
+                        }
                     }
                 }
             }
@@ -112,14 +121,24 @@ public class UserNotificationJob extends JobService {
 
         protected void getNotifications (final String user){
 
-            Log.i("insideGetnotif", "user");
+            Log.i("insideGetnotif", user);
             String endpoint = "http://104.236.55.88:8000/api/usuario/notificacoes";
+            settings = getSharedPreferences("gisUnespSettings", 0);
 
             GsonBuilder gsonBuilder = new GsonBuilder();
             gson = gsonBuilder.create();
             requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-            StringRequest requestGet = new StringRequest(Request.Method.GET, endpoint, onNotifsLoaded, onFetchError);
+            StringRequest requestGet = new StringRequest(Request.Method.GET, endpoint, onNotifsLoaded, onFetchError){
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String,String> params = new HashMap<String, String>();
+                    params.put("Accept","application/json");
+                    params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
+                    return params;
+                }
+            };
             requestQueue.add(requestGet);
 
 
@@ -150,17 +169,8 @@ public class UserNotificationJob extends JobService {
                             .setContentText("Seu relato foi votado "+mensagem+"!");
             NotificationManager mNotificationManager =
                     (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(1, mBuilder.build());
+            mNotificationManager.notify(notification.data.confirmacao_id, mBuilder.build());
 
-
-            /*NotificationCompat.Builder mBuilder =
-                    new NotificationCompat.Builder(getApplicationContext())
-                            .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
-                            .setContentTitle("Confirmação")
-                            .setContentText("Seu relato foi votado!");
-            NotificationManager mNotificationManager =
-                    (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            mNotificationManager.notify(1, mBuilder.build());*/
         }
     }
 }

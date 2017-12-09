@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabItem;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -36,7 +37,7 @@ public class AdminActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
     private Gson gson;
-
+    private List<Problem> problems;
 
 
 
@@ -44,12 +45,10 @@ public class AdminActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
-        //Instância da lista
-
-
 
         //Botão para organizar por melhor votados
         final Button sortByVoteButton = (Button) findViewById(R.id.sortByVoteButton);
+
         sortByVoteButton.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
                 BuildList("votes");
@@ -63,9 +62,35 @@ public class AdminActivity extends AppCompatActivity {
                 BuildList("older");
             }
         });
+
+        final Button showDataButton = (Button) findViewById(R.id.reportsButton);
+        showDataButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                swapList("reports");
+            }
+        });
+
         requestQueue = Volley.newRequestQueue(this);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
+        problems = null;
+        BuildList("votes");
+        generateData();
+
+    }
+
+    public void swapList (String infoType){
+
+        if (infoType.equalsIgnoreCase("reports")){
+            ListView problemList = (ListView) findViewById(R.id.problemList);
+            problemList.setVisibility(View.GONE);
+
+        }
+    }
+
+    public void generateData () {
+
     }
 
     public void BuildList (String orderBy){
@@ -92,14 +117,14 @@ public class AdminActivity extends AppCompatActivity {
         @Override
         public void onResponse(String response) {
             Log.i("resposta",response.toString());
-            GeoPoint point;
+
             /*Fazer parsing do JSON*/
             JsonElement parsedResponse = new JsonParser().parse(response);
             JsonObject dataObject = parsedResponse.getAsJsonObject();
             JsonArray dataArray = dataObject.getAsJsonArray("data");
 
             /*chamar a função de adicionar marcador para cada ponto encontrado*/
-            List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
+            problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
             final ListView problemList = (ListView) findViewById(R.id.problemList);
             ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(),0, problems);
             problemList.setAdapter(adapter);
@@ -107,6 +132,9 @@ public class AdminActivity extends AppCompatActivity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Object listItem = problemList.getItemAtPosition(position);
+                    Problem problemaClicado = (Problem) listItem;
+                    Log.d("clicando", problemaClicado.titulo);
+
                 }
             });
 
@@ -124,5 +152,9 @@ public class AdminActivity extends AppCompatActivity {
             Log.e("PostActivity", error.toString());
         }
     };
+
+    public void OpenProblemDetails (Problem toDetail){
+
+    }
 
 }

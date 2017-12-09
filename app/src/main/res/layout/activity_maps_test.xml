@@ -27,11 +27,12 @@
 
     <Button
         android:id="@+id/addProblem"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:drawableLeft="@drawable/ic_announcement_black_24dp"
+        android:drawableLeft="@drawable/ic_feedback_white_24dp"
         android:text="Relatar Problema"
         android:visibility="invisible" />
 

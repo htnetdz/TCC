@@ -1,9 +1,8 @@
 package com.example.henrique.tcc;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.v4.app.NotificationCompat;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +26,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.String.valueOf;
@@ -39,6 +40,7 @@ import static java.lang.String.valueOf;
 public class ProblemDetails extends MarkerInfoWindow {
 
     private ProblemMarker attachedMarker;
+    private Problem[] toUpdate;
     private RequestQueue requestQueue;
     private Gson gson;
 
@@ -51,35 +53,53 @@ public class ProblemDetails extends MarkerInfoWindow {
     public void onOpen(Object item){
         attachedMarker = (ProblemMarker) item;
         settings = getView().getContext().getSharedPreferences("gisUnespSettings", 0);
-        TextView title = (TextView) (mView.findViewById(R.id.detailsTitle));
-        title.setText(attachedMarker.problemTitle);
-        TextView description = (TextView) (mView.findViewById(R.id.detailsDescription));
-        description.setText(attachedMarker.problemDescription);
-        final TextView voteCountUp = (TextView) (mView.findViewById(R.id.detailsVotesUp));
-        voteCountUp.setText(String.valueOf(attachedMarker.votesUp));
-        final TextView voteCountDown = (TextView) (mView.findViewById(R.id.detailsVotesDown));
-        voteCountDown.setText(String.valueOf(attachedMarker.votesDown));
-
-
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
         requestQueue = Volley.newRequestQueue(getView().getContext());
 
+        getProblem(attachedMarker.problemId);
+
+
+    }
+
+    public void prepareDetail(){
+        TextView title = (TextView) (mView.findViewById(R.id.detailsTitleLabel));
+        title.setText(toUpdate[0].titulo);
+        TextView description = (TextView) (mView.findViewById(R.id.detailsDescription));
+        description.setText(toUpdate[0].descricao);
+        final TextView voteCountUp = (TextView) (mView.findViewById(R.id.detailsVotesUp));
+        voteCountUp.setText(String.valueOf(toUpdate[0].votos_pos));
+        final TextView voteCountDown = (TextView) (mView.findViewById(R.id.detailsVotesDown));
+        voteCountDown.setText(String.valueOf(toUpdate[0].votos_neg));
+        final TextView userQuery = (TextView) mView.findViewById(R.id.userQuery);
+        final TextView problemStatus = (TextView) mView.findViewById(R.id.solvedDesc);
+
+
         if (attachedMarker != null){
-            if (attachedMarker.problemTitle != null)
+            if (toUpdate[0].titulo != null)
                 title.setText(attachedMarker.problemTitle);
 
-            if (attachedMarker.problemDescription != null)
+            if (toUpdate[0].descricao != null)
                 title.setText(attachedMarker.problemDescription);
 
-            voteCountUp.setText(valueOf(attachedMarker.votesUp));
-            voteCountDown.setText(valueOf(attachedMarker.votesDown));
+            if(toUpdate[0].resolvido == true){
+                userQuery.setText("Este problema foi mesmo resolvido?");
+                problemStatus.setText("RESOLVIDO");
+                problemStatus.setTextColor(Color.parseColor("#ff669900"));
+            }
+            else{
+                userQuery.setText("Este relato está correto?");
+                problemStatus.setText("PENDENTE");
+                problemStatus.setTextColor(Color.parseColor("#ffcc0000"));
+            }
+            voteCountUp.setText(valueOf(toUpdate[0].votos_pos));
+            voteCountDown.setText(valueOf(toUpdate[0].votos_neg));
 
         }
 
-            title.setText(attachedMarker.problemTitle);
+        title.setText(toUpdate[0].titulo);
 
-        String problemParam = toString().valueOf(attachedMarker.problemId);
+        String problemParam = toString().valueOf(toUpdate[0].problema_id);
         final String endpoint = "http://104.236.55.88:8000/api/problema/"+problemParam+"/confirmacao";
 
         Button voteUp = (Button) (mView.findViewById(R.id.detailsVoteUpButton));
@@ -89,11 +109,12 @@ public class ProblemDetails extends MarkerInfoWindow {
         TextView voteCountNo = (TextView) (mView.findViewById(R.id.detailsVotesDown));
 
         if (settings.getInt("userId",0) == 0){
-           voteUp.setVisibility(View.INVISIBLE);
-           voteDown.setVisibility(View.INVISIBLE);
-           voteCountYes.setVisibility(View.INVISIBLE);
-           voteCountNo.setVisibility(View.INVISIBLE);
-           solvedBtn.setVisibility(View.INVISIBLE);
+            voteUp.setVisibility(View.INVISIBLE);
+            voteDown.setVisibility(View.INVISIBLE);
+            voteCountYes.setVisibility(View.INVISIBLE);
+            voteCountNo.setVisibility(View.INVISIBLE);
+            solvedBtn.setVisibility(View.INVISIBLE);
+            userQuery.setVisibility(View.INVISIBLE);
         }
         else{
             if (settings.getString("userType", "").equals("comum")) {
@@ -101,11 +122,11 @@ public class ProblemDetails extends MarkerInfoWindow {
                 voteDown.setVisibility(View.VISIBLE);
                 voteCountYes.setVisibility(View.VISIBLE);
                 voteCountNo.setVisibility(View.VISIBLE);
-                solvedBtn.setVisibility(View.INVISIBLE);
+                solvedBtn.setVisibility(View.VISIBLE);
             }
             else{
-                voteUp.setVisibility(View.INVISIBLE);
-                voteDown.setVisibility(View.INVISIBLE);
+                voteUp.setVisibility(View.GONE);
+                voteDown.setVisibility(View.GONE);
                 voteCountYes.setVisibility(View.VISIBLE);
                 voteCountNo.setVisibility(View.VISIBLE);
                 solvedBtn.setVisibility(View.VISIBLE);
@@ -117,7 +138,7 @@ public class ProblemDetails extends MarkerInfoWindow {
 
             @Override
             public void onClick(View v) {
-                mandarVoto(1, endpoint);
+                sendVote(1, endpoint);
 
             }
         });
@@ -126,21 +147,75 @@ public class ProblemDetails extends MarkerInfoWindow {
 
             @Override
             public void onClick(View v) {
-                mandarVoto(2, endpoint);
+                sendVote(2, endpoint);
             }
         });
 
         solvedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mandarVoto(3, endpoint);
+                solveProblem(attachedMarker.problemId);
             }
         });
+    }
 
+
+    public void solveProblem (int problemId){
+        String solveEndpoint = "http://104.236.55.88:8000/api/problema/"+String.valueOf(problemId)+"/resolve";
+
+        StringRequest request = new StringRequest(Request.Method.PATCH, solveEndpoint,new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // Do something with the response
+                Log.d("Solve Success", response);
+                JsonElement parsedResponse = new JsonParser().parse(response);
+                JsonObject dataObject = parsedResponse.getAsJsonObject();
+                JsonObject jsonProblem= dataObject.getAsJsonObject("data");
+                final TextView userQuery = (TextView) mView.findViewById(R.id.userQuery);
+                final TextView problemStatus = (TextView) mView.findViewById(R.id.solvedDesc);
+
+
+                Problem updatedProblem = gson.fromJson(jsonProblem, Problem.class);
+                if(updatedProblem.resolvido){
+                    userQuery.setText("Este problema foi mesmo resolvido?");
+                    problemStatus.setText("RESOLVIDO");
+                    problemStatus.setTextColor(Color.parseColor("#ff669900"));
+                }
+                else{
+                    userQuery.setText("Este relato está correto?");
+                    problemStatus.setText("PENDENTE");
+                    problemStatus.setTextColor(Color.parseColor("#ffcc0000"));
+                }
+
+            }
+        },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle error
+                        Log.d("Solve Fail", error.toString());
+                    }
+                }){
+            @Override
+
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Accept","application/json");
+                params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
+                return params;
+            }
+        };
+        requestQueue.add(request);
 
     }
 
-    public void mandarVoto (final int voto, String endpoint){
+    public void sendVote(final int voto, String endpoint){
         final SharedPreferences settings = getView().getContext().getSharedPreferences("gisUnespSettings", 0);
         StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
             @Override
@@ -188,12 +263,50 @@ public class ProblemDetails extends MarkerInfoWindow {
                 return params;
             }
         };
-
-
         requestQueue.add(request);
 
 
 
+    }
+
+    public void getProblem (int id){
+        String endpoint = "http://104.236.55.88:8000/api/problema/"+String.valueOf(id);
+        StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                Log.d("getProblems", response);
+                JsonElement parsedResponse = new JsonParser().parse(response);
+                JsonObject dataObject = parsedResponse.getAsJsonObject();
+                JsonArray problemJSON = dataObject.getAsJsonArray("data");
+                Problem[] updatedProblem = gson.fromJson(problemJSON, Problem[].class);
+
+                toUpdate = updatedProblem;
+                prepareDetail();
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Accept","application/json");
+                params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
+                return params;
+            }
+        };
+        requestQueue.add(request);
     }
 
 

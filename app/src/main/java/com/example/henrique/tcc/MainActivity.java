@@ -11,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK){
             Log.d("LOGINSUCESS", "Dentro de onActvivity result");
             logInUiChanges();
-           /*registerJob();*/
+           registerJob();
         }
 
     }
@@ -104,28 +105,12 @@ public class MainActivity extends AppCompatActivity {
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
             jobScheduler.schedule(jobInfo);
+
+            Log.i("REGISTERINGJOB", "Job Registrado");
             }
 
     }
 
-    /*@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override protected void onRestart() {
-
-        super.onRestart();
-
-        settings = getSharedPreferences("gisUnespSettings", 0);
-
-        TextView topText = (TextView) findViewById(R.id.sample_text);
-        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
-
-        if (settings.getInt("userId", 0) == 0){
-            logOutUiChanges();
-        }
-        else{
-            logInUiChanges();
-        }
-
-    }*/
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override protected void onResume() {
@@ -134,9 +119,13 @@ public class MainActivity extends AppCompatActivity {
         settings = getSharedPreferences("gisUnespSettings", 0);
 
         Log.d("On Resume", settings.getAll().toString());
+
         TextView topText = (TextView) findViewById(R.id.sample_text);
-        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
-        logInUiChanges();
+        Typeface face=Typeface.createFromAsset(getAssets(),"fonts/SwissBold.ttf");
+        topText.setTypeface(face);
+
+        if (settings.getInt("userId", 0) != 0)
+            logInUiChanges();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -153,7 +142,10 @@ public class MainActivity extends AppCompatActivity {
         String userType = settings.getString("userType", "");
         Log.d("tipousuario", userType);
         Button adminButton = (Button) findViewById(R.id.adminButton);
+        TextView adminHelp = (TextView) findViewById(R.id.adminAreaButtonHelp);
         Button userButton = (Button) findViewById(R.id.userButton);
+        TextView userHelp = (TextView) findViewById(R.id.userAreaButtonHelp);
+
         boolean userState = userType.equalsIgnoreCase("comum");
         Log.d("userState", String.valueOf(userState));
 
@@ -166,15 +158,36 @@ public class MainActivity extends AppCompatActivity {
                         startActivity (i);
                     }
                 });
+                adminHelp.setVisibility(View.VISIBLE);
                 adminButton.invalidate();
                 userButton.setVisibility(View.INVISIBLE);
+                adminHelp.invalidate();
+                userHelp.setVisibility(View.INVISIBLE);
+                userHelp.invalidate();
                 userButton.invalidate();
             }
             else if (userType.equalsIgnoreCase("comum")) {
                 Log.d("loginuichanges comum","");
-                adminButton.setVisibility(View.INVISIBLE);
+                adminButton.setVisibility(View.VISIBLE);
+                //TESTES, TIRAR
+                adminButton.setOnClickListener(new View.OnClickListener(){
+                    public void onClick (View v){
+                        Intent i = new Intent(getApplicationContext(), AdminActivity.class);
+                        startActivity (i);
+                    }
+                });
+                adminHelp.setVisibility(View.VISIBLE);
+                userButton.setVisibility(View.VISIBLE);
+                adminHelp.invalidate();
+                userHelp.invalidate();
                 adminButton.invalidate();
                 userButton.setVisibility(View.VISIBLE);
+                userButton.setOnClickListener(new View.OnClickListener(){
+                    public void onClick (View v){
+                        Intent i = new Intent(getApplicationContext(), UserListActivity.class);
+                        startActivity (i);
+                    }
+                });
                 userButton.invalidate();
             }
 
@@ -210,7 +223,11 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt("userId", 0);
         editor.commit();
 
-        /*unregisterJob();*/
+
+        TextView adminHelp = (TextView) findViewById(R.id.adminAreaButtonHelp);
+        TextView userHelp = (TextView) findViewById(R.id.userAreaButtonHelp);
+
+        unregisterJob();
 
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
@@ -229,6 +246,10 @@ public class MainActivity extends AppCompatActivity {
         adminButton.invalidate();
         userButton.setVisibility(View.INVISIBLE);
         userButton.invalidate();
+        userHelp.setVisibility(View.INVISIBLE);
+        userHelp.invalidate();
+        adminHelp.setVisibility(View.INVISIBLE);
+        adminHelp.invalidate();
 
     }
 
@@ -284,7 +305,7 @@ public class MainActivity extends AppCompatActivity {
         NetworkInfo netStatus = manager.getActiveNetworkInfo();
 
         //Checando e pedindo por GPS
-        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER) && !gpsStatus.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
             //Diálogo para pedir GPS
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Falta de GPS");

@@ -109,5 +109,5 @@
     <string name="permission_rationale">"Acesso aos contatos habilitará sugestões no campo de email"
     </string>
     <string name="title_activity_user_registration">UserRegistrationActivity</string>
-    <string name="title_activity_user_list">UserListActivity</string>
+    <string name="title_activity_user_list">Meus Relatos e Votos</string>
 </resources>

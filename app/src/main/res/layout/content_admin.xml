@@ -7,34 +7,78 @@
     tools:context="com.example.henrique.tcc.AdminActivity"
     tools:showIn="@layout/activity_admin">
 
-    <Button
-        android:id="@+id/sortByVoteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mais Votados"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <Button
-        android:id="@+id/sortByOlderButton"
+    <SearchView
+        android:id="@+id/searchView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="104dp"
-        android:text="Mais Antigos"
-        android:visibility="visible"
-        app:layout_constraintLeft_toRightOf="@+id/sortByVoteButton"
-        tools:layout_editor_absoluteY="16dp" />
+        android:layout_height="50dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </SearchView>
 
     <ListView
         android:id="@+id/problemList"
-        android:paddingBottom="70dp"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_margin="8sp"
+        android:layout_marginBottom="388dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:paddingBottom="70dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sortByOlderButton" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+
+    </ListView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="368dp"
+        android:layout_height="56dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/transparent"
+        android:backgroundTint="@android:color/transparent"
+        android:orientation="horizontal"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/searchView">
+
+        <Button
+            android:id="@+id/sortByVoteButton"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mais Votados" />
+
+        <Button
+            android:id="@+id/sortByOlderButton"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Mais Antigos" />
+
+        <Button
+            android:id="@+id/reportsButton"
+            style="?attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Relatórios"
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="8dp" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

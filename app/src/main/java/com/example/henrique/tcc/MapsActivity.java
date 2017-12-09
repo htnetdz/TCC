@@ -202,13 +202,19 @@ public class MapsActivity extends FragmentActivity {
 
     public void PrepareMap() {
 
+        GeoPoint uniCenter = new GeoPoint(-22.3492696, -49.0326935);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
         mMap.setTileSource(TileSourceFactory.MAPNIK);
+        mMap.setMaxZoomLevel(18);
+        mMap.setMinZoomLevel(16);
         mMap.setBuiltInZoomControls(false);
         mMap.setMultiTouchControls(true);
+
         OsmC = (MapController) mMap.getController();
-        OsmC.setZoom(100);
+        OsmC.setZoom(500);
+
+        OsmC.animateTo(uniCenter);
 
         AddYou();
         GetMarkersDB();
@@ -225,7 +231,7 @@ public class MapsActivity extends FragmentActivity {
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            OsmC.animateTo(startPoint);
+                            /*OsmC.animateTo(startPoint);*/
                             AddMarker(startPoint, null, 0);
                         }
                     }
@@ -255,6 +261,7 @@ public class MapsActivity extends FragmentActivity {
             newMarker.setVotesUp(problemToMark.votos_pos);
             newMarker.setVotesDown(problemToMark.votos_neg);
             newMarker.setProblemId(problemToMark.problema_id);
+            newMarker.setSolved(problemToMark.resolvido);
             newMarker.setInfoWindow(new ProblemDetails(mMap));
         }
        /* mMap.getOverlays().clear();*/

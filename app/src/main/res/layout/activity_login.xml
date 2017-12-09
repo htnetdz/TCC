@@ -65,7 +65,7 @@
 
             <Button
                 android:id="@+id/email_sign_in_button"
-                style="?android:textAppearanceSmall"
+                style="@style/Base.Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -74,6 +74,7 @@
 
             <Button
                 android:id="@+id/newUserButton"
+                style="@style/Base.Widget.AppCompat.Button.Colored"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Novo Usuário? Cadastre-se" />
@@ -87,7 +88,8 @@
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.AppCompat"
                 android:textColor="@color/colorPrimaryDark"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:visibility="invisible" />
 
 
         </LinearLayout>

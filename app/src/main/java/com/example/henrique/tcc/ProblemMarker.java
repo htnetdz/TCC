@@ -20,6 +20,7 @@ public class ProblemMarker extends org.osmdroid.views.overlay.Marker {
     public int votesUp;
     public int votesDown;
     public int problemId;
+    public boolean solved;
 
     public String getProblemTitle() {
         return problemTitle;
@@ -59,5 +60,13 @@ public class ProblemMarker extends org.osmdroid.views.overlay.Marker {
 
     public void setProblemId(int problemId) {
         this.problemId = problemId;
+    }
+
+    public boolean getSolved() {
+        return solved;
+    }
+
+    public void setSolved(boolean solved) {
+        this.solved = solved;
     }
 }

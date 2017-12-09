@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/detailsTitleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
+        android:text="Título"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/detailTitleValue"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/detailTitleValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="133dp" />
+
+    <TextView
+        android:id="@+id/detailsDescLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
+        android:text="Descrição"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/detailDescValue"
+        app:layout_constraintTop_toBottomOf="@+id/detailsTypeLabel" />
+
+    <TextView
+        android:id="@+id/detailTypeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintTop_toBottomOf="@+id/detailTitleValue"
+        tools:layout_editor_absoluteX="133dp" />
+
+    <TextView
+        android:id="@+id/detailsTypeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
+        android:text="Tipo"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/detailTypeValue"
+        app:layout_constraintTop_toBottomOf="@+id/detailsTitleLabel" />
+
+    <TextView
+        android:id="@+id/detailDescValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintTop_toBottomOf="@+id/detailTypeValue"
+        tools:layout_editor_absoluteX="133dp" />
+
+    <TextView
+        android:id="@+id/detailsSolvedLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
+        android:text="Resolvido"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/detailSolvedValue"
+        app:layout_constraintTop_toBottomOf="@+id/detailsDescLabel" />
+
+    <TextView
+        android:id="@+id/detailSolvedValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintTop_toBottomOf="@+id/detailDescValue"
+        tools:layout_editor_absoluteX="133dp" />
+
+    <TextView
+        android:id="@+id/detailCoordLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="16dp"
+        android:text="Local"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toStartOf="@+id/textView11"
+        app:layout_constraintTop_toBottomOf="@+id/detailsSolvedLabel" />
+
+    <TextView
+        android:id="@+id/textView11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="TextView"
+        app:layout_constraintTop_toBottomOf="@+id/detailSolvedValue"
+        tools:layout_editor_absoluteX="133dp" />
+
+</android.support.constraint.ConstraintLayout>

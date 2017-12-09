@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="5sp"
     android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
-    android:backgroundTint="@color/wallet_dim_foreground_disabled_holo_dark">
+    android:backgroundTint="#b3e5fc">
 
     <ImageView
         android:id="@+id/problemIcon"
