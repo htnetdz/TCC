@@ -100,7 +100,6 @@ public class UserNotificationJob extends JobService {
                 if (dataObject.isJsonArray()) {
                     notificationJSON = dataObject.getAsJsonArray("data");
 
-
                     List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
 
                     if (unreadNotifications.isEmpty() == false) {

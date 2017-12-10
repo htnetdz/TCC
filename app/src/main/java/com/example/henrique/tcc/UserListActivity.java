@@ -2,8 +2,6 @@ package com.example.henrique.tcc;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -51,21 +50,29 @@ public class UserListActivity extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(this);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
-        BuildList(currentUser, 0);
+        buildProblemList(currentUser, 0);
 
         final Button reportsButton = (Button) findViewById(R.id.reportsButton);
         reportsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BuildList(currentUser, 0);
+                buildProblemList(currentUser, 0);
             }
         });
 
         final Button votesButton = (Button) findViewById(R.id.votesButton);
-        reportsButton.setOnClickListener(new View.OnClickListener() {
+        votesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                BuildList(currentUser, 1);
+                buildProblemList(currentUser, 1);
+            }
+        });
+
+        final Button notifsButton = (Button) findViewById(R.id.notificationsButton);
+        notifsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                buildNotifList();
             }
         });
 
@@ -91,7 +98,7 @@ public class UserListActivity extends AppCompatActivity {
         return resultList;
     }
 
-    public void BuildList(int userId, int mode){
+    public void buildProblemList(int userId, int mode){
         final int filterMode = mode;
         final int filterId = userId;
         String endpoint = "http://104.236.55.88:8000/api/problemas/usuario/"+String.valueOf(filterId);
@@ -108,11 +115,11 @@ public class UserListActivity extends AppCompatActivity {
 
                 if (filterMode !=0) {
                   filteredProblems = filterList(problems, filterMode, filterId);
-                  Log.d("filtrado", filteredProblems.toString());
                 }
 
                 final ListView problemList = (ListView) findViewById(R.id.User_Report_List);
                 if (filteredProblems != null) {
+                    Log.d("filtrado", filteredProblems.toString());
                     ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(), 0, filteredProblems);
                     problemList.setAdapter(adapter);
                     problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -120,11 +127,79 @@ public class UserListActivity extends AppCompatActivity {
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                             Object listItem = problemList.getItemAtPosition(position);
                             Log.d("clicando", listItem.toString());
+
                         }
                     });
                 }
+                else{
+                    problemList.setAdapter(null);
+                }
             }
         }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Accept","application/json");
+                params.put("Authorization","Bearer"+" "+settings.getString("userToken",""));
+                return params;
+            }
+        };
+
+        requestQueue.add(request);
+    }
+
+    public void buildNotifList(){
+        String endpoint = "http://104.236.55.88:8000/api/usuario/notificacoes";
+        StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                Log.d("RESPOSTA POST", response.toString());
+                /*Fazer parsing do JSON*/
+                JsonElement parsedResponse = new JsonParser().parse(response);
+                JsonObject dataObject = parsedResponse.getAsJsonObject();
+                final ListView notifsList = (ListView) findViewById(R.id.User_Report_List);
+
+                if (dataObject.isJsonArray()){
+                    JsonArray dataArray = dataObject.getAsJsonArray("data");
+                    List<NotificationObject> notifs = Arrays.asList(gson.fromJson(dataArray, NotificationObject[].class));
+                    List<NotificationInfo> notifData = new ArrayList<>();
+
+
+                if (notifs != null) {
+                    Log.d("filtrado", notifs.toString());
+
+                    for (NotificationObject notif : notifs){
+                        notifData.add(notif.data);
+                    }
+
+
+                    NotifAdapter adapter = new NotifAdapter(getApplicationContext(), 0, notifData);
+                    notifsList.setAdapter(adapter);
+                    notifsList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Object listItem = notifsList.getItemAtPosition(position);
+                            Log.d("clicando", listItem.toString());
+
+                        }
+                    });
+                }
+                else{
+                    Log.d("notifications", "null");
+                    notifsList.setAdapter(null);
+                }
+            }
+            else{
+                    Log.d("notifications", "null");
+                    notifsList.setAdapter(null);
+                }
+        }}, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
 

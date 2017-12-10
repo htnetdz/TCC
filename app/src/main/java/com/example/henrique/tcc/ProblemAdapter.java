@@ -1,8 +1,6 @@
 package com.example.henrique.tcc;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
-
-import static com.example.henrique.tcc.R.drawable.ic_local_movies_black_24dp;
 
 /**
  * Created by Henrique on 06/09/2017.
@@ -35,7 +31,7 @@ public class ProblemAdapter extends ArrayAdapter<Problem> implements Filterable{
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.problem_item, parent, false);
         }
         // Lookup view for data population
-        TextView problemTitle = (TextView) convertView.findViewById(R.id.problemTitle);
+        TextView problemTitle = (TextView) convertView.findViewById(R.id.notifTitle);
         TextView  problemDescription= (TextView) convertView.findViewById(R.id.problemDescription);
         ImageView problemIcon = (ImageView) convertView.findViewById(R.id.problemIcon);
         TextView voteUpCounter = (TextView) convertView.findViewById(R.id.listVoteUpCount);

@@ -20,7 +20,7 @@
         app:srcCompat="@drawable/btn_moreinfo" />
 
     <TextView
-        android:id="@+id/problemTitle"
+        android:id="@+id/notifTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -36,11 +36,11 @@
         android:id="@+id/problemDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/problemTitle"
+        android:layout_alignLeft="@+id/notifTitle"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignStart="@+id/problemTitle"
-        android:layout_below="@+id/problemTitle"
+        android:layout_alignStart="@+id/notifTitle"
+        android:layout_below="@+id/notifTitle"
         android:text="TextView"
         android:textSize="18sp" />
 

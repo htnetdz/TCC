@@ -123,6 +123,7 @@ public class ProblemDetails extends MarkerInfoWindow {
                 voteCountYes.setVisibility(View.VISIBLE);
                 voteCountNo.setVisibility(View.VISIBLE);
                 solvedBtn.setVisibility(View.VISIBLE);
+                userQuery.setVisibility(View.VISIBLE);
             }
             else{
                 voteUp.setVisibility(View.GONE);

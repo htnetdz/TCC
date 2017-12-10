@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("Prefeituras", settings.getAll().toString());
         TextView topText = (TextView) findViewById(R.id.sample_text);
-        topText.setText("Bem vindo, "+settings.getString("userName","ao GISUnesp"));
+        topText.setText("Bem vindo "+settings.getString("userName","ao GISUnesp"));
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
         if (settings.getInt("userId", 0) == 0){

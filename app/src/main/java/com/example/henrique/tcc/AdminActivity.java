@@ -13,6 +13,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.ViewSwitcher;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,7 +40,7 @@ public class AdminActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private Gson gson;
     private List<Problem> problems;
-
+    private String callingList;
 
 
     @Override
@@ -76,20 +78,74 @@ public class AdminActivity extends AppCompatActivity {
         gson = gsonBuilder.create();
         problems = null;
         BuildList("votes");
-        generateData();
+
 
     }
 
-    public void swapList (String infoType){
+    public void swapList (String viewToShow){
+        ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.adminviewswitcher);
 
-        if (infoType.equalsIgnoreCase("reports")){
-            ListView problemList = (ListView) findViewById(R.id.problemList);
-            problemList.setVisibility(View.GONE);
-
+        if (viewToShow.equalsIgnoreCase("problems")) {
+            if (switcher.getCurrentView() == findViewById(R.id.reportsLayout)) {
+                Log.d("listaproblemas", "in");
+                switcher.showPrevious();
+            }
         }
+        if (viewToShow.equalsIgnoreCase("reports")) {
+            if (switcher.getCurrentView() == findViewById(R.id.problemList)) {
+                Log.d("relatorios", "in");
+                switcher.showNext();
+            }
+        }
+
+
     }
 
     public void generateData () {
+        int totalProblems = problems.size();
+        int numberSolved= 0;
+        int[] types = {0,0,0,0};
+        int maxType = 0;
+
+        for (Problem eachProblem : problems){
+            //Define de qual tipo é o problema, aumenta o contador daquele tipo
+            /*types[eachProblem.tipo_problema_id-1]++;
+
+            //Define qual o tipo com maior número de problemas
+            if (types[eachProblem.tipo_problema_id-1] > maxType){
+                maxType = eachProblem.problema_id-1;
+            }*/
+
+            //Define quantos problemas estão resolvidos
+            if(eachProblem.resolvido){
+                numberSolved++;
+            }
+        }
+
+        //Escrevendo os Relatórios
+        TextView total = (TextView) findViewById(R.id.problemNumberValue);
+        TextView solved = (TextView) findViewById(R.id.solvedNumberValue);
+        TextView solvedPercent = (TextView) findViewById(R.id.solvedNumberPercent);
+        TextView type = (TextView) findViewById(R.id.numberTypeValue);
+
+        Double percent = ((numberSolved*1.0)/(totalProblems*1.0))*100;
+
+        total.setText(String.valueOf(totalProblems));
+        solved.setText(String.valueOf(numberSolved));
+        solvedPercent.setText("("+String.valueOf(percent)+"%"+")");
+
+        /*if (maxType ==0){
+            type.setText("Acesso");
+        }
+        if (maxType == 1){
+            type.setText("Água e Abastecimento");
+        }
+        if (maxType == 2){
+            type.setText("Luz e Equipamentos Elétricos");
+        }
+        if (maxType == 3){
+            type.setText("Segurança");
+        }*/
 
     }
 
@@ -98,9 +154,11 @@ public class AdminActivity extends AppCompatActivity {
         problemList.setAdapter(null);
         String endpoint = null;
         if (orderBy == "votes"){
+            callingList = "problems";
            endpoint = "http://104.236.55.88:8000/api/problemas?order_votos_pos=true";
         }
         if (orderBy == "older"){
+            callingList = "problems";
             endpoint = "http://104.236.55.88:8000/api/problemas?order_antigos=true";
         }
         fetchProblems(endpoint);
@@ -125,15 +183,12 @@ public class AdminActivity extends AppCompatActivity {
 
             /*chamar a função de adicionar marcador para cada ponto encontrado*/
             problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
-            final ListView problemList = (ListView) findViewById(R.id.problemList);
+            ListView problemList = (ListView) findViewById(R.id.problemList);
             ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(),0, problems);
             problemList.setAdapter(adapter);
             problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Object listItem = problemList.getItemAtPosition(position);
-                    Problem problemaClicado = (Problem) listItem;
-                    Log.d("clicando", problemaClicado.titulo);
 
                 }
             });
@@ -141,6 +196,10 @@ public class AdminActivity extends AppCompatActivity {
             Log.d("Adapter status", adapter.toString());
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
 
+            if(problems.isEmpty() == false)
+                generateData();
+
+            swapList(callingList);
 
         }
     };
