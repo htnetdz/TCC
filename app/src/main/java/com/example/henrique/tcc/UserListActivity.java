@@ -2,6 +2,7 @@ package com.example.henrique.tcc;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -26,8 +27,11 @@ import com.google.gson.JsonParser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 public class UserListActivity extends AppCompatActivity {
@@ -80,7 +84,128 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     public List<Problem> filterList (List<Problem> listToFilter, int mode, int user){
-        List<Problem> resultList = null;
+        List<Problem> resultList = new List<Problem>() {
+            @Override
+            public int size() {
+                return 0;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return false;
+            }
+
+            @NonNull
+            @Override
+            public Iterator<Problem> iterator() {
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public Object[] toArray() {
+                return new Object[0];
+            }
+
+            @NonNull
+            @Override
+            public <T> T[] toArray(@NonNull T[] a) {
+                return null;
+            }
+
+            @Override
+            public boolean add(Problem problem) {
+                return false;
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return false;
+            }
+
+            @Override
+            public boolean containsAll(@NonNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(@NonNull Collection<? extends Problem> c) {
+                return false;
+            }
+
+            @Override
+            public boolean addAll(int index, @NonNull Collection<? extends Problem> c) {
+                return false;
+            }
+
+            @Override
+            public boolean removeAll(@NonNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public boolean retainAll(@NonNull Collection<?> c) {
+                return false;
+            }
+
+            @Override
+            public void clear() {
+
+            }
+
+            @Override
+            public Problem get(int index) {
+                return null;
+            }
+
+            @Override
+            public Problem set(int index, Problem element) {
+                return null;
+            }
+
+            @Override
+            public void add(int index, Problem element) {
+
+            }
+
+            @Override
+            public Problem remove(int index) {
+                return null;
+            }
+
+            @Override
+            public int indexOf(Object o) {
+                return 0;
+            }
+
+            @Override
+            public int lastIndexOf(Object o) {
+                return 0;
+            }
+
+            @NonNull
+            @Override
+            public ListIterator<Problem> listIterator() {
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public ListIterator<Problem> listIterator(int index) {
+                return null;
+            }
+
+            @NonNull
+            @Override
+            public List<Problem> subList(int fromIndex, int toIndex) {
+                return null;
+            }
+        };
 
         //Filtering by vote, not by problems created by the user
        if (mode == 1) {
@@ -101,7 +226,7 @@ public class UserListActivity extends AppCompatActivity {
     public void buildProblemList(int userId, int mode){
         final int filterMode = mode;
         final int filterId = userId;
-        String endpoint = "http://104.236.55.88:8000/api/problemas/usuario/"+String.valueOf(filterId);
+        String endpoint = "http://104.236.55.88:8000/api/problemas/usuario/";
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
             @Override
             public void onResponse(String response) {
@@ -114,6 +239,7 @@ public class UserListActivity extends AppCompatActivity {
                 List<Problem> filteredProblems = problems;
 
                 if (filterMode !=0) {
+                    Log.d("Filtrando","");
                   filteredProblems = filterList(problems, filterMode, filterId);
                 }
 
@@ -165,7 +291,8 @@ public class UserListActivity extends AppCompatActivity {
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
                 final ListView notifsList = (ListView) findViewById(R.id.User_Report_List);
 
-                if (dataObject.isJsonArray()){
+                if (dataObject.isJsonObject()){
+                    Log.d("Parsing", dataObject.toString());
                     JsonArray dataArray = dataObject.getAsJsonArray("data");
                     List<NotificationObject> notifs = Arrays.asList(gson.fromJson(dataArray, NotificationObject[].class));
                     List<NotificationInfo> notifData = new ArrayList<>();

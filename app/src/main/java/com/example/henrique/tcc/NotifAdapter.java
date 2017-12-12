@@ -57,7 +57,7 @@ public class NotifAdapter extends ArrayAdapter<NotificationInfo>{
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.problem_item, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.notif_item, parent, false);
         }
         // Lookup view for data population
 
@@ -82,6 +82,9 @@ public class NotifAdapter extends ArrayAdapter<NotificationInfo>{
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
                 JsonArray problemJSON = dataObject.getAsJsonArray("data");
                 Problem[] updatedProblem = gson.fromJson(problemJSON, Problem[].class);
+
+                ImageView notifIcon = (ImageView) referenceView.findViewById(R.id.notifIcon);
+                notifIcon.setImageResource(R.drawable.ic_notifications_black_24dp);
 
                 TextView notifTitle = (TextView) referenceView.findViewById(R.id.notifTitle);
                 notifTitle.setText(updatedProblem[0].titulo);

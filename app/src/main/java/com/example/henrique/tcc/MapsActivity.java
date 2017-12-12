@@ -55,6 +55,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -202,10 +203,27 @@ public class MapsActivity extends FragmentActivity {
 
     public void PrepareMap() {
 
-        GeoPoint uniCenter = new GeoPoint(-22.3492696, -49.0326935);
+        final GeoPoint uniCenter = new GeoPoint(-22.3492696, -49.0326935);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
+
+        /*final float scale = getResources().getDisplayMetrics().density;
+        final int newScale = (int) (256 * scale);
+        String[] OSMSource = new String[2];
+        OSMSource[0] = "http://a.tile.openstreetmap.org/";
+        OSMSource[1] = "http://b.tile.openstreetmap.org/";
+        XYTileSource MapSource = new XYTileSource(
+                "OSM",
+                null,
+                1,
+                18,
+                newScale,
+                ".png",
+                OSMSource
+        );*/
+
         mMap.setTileSource(TileSourceFactory.MAPNIK);
+
         mMap.setMaxZoomLevel(18);
         mMap.setMinZoomLevel(16);
         mMap.setBuiltInZoomControls(false);
@@ -214,9 +232,23 @@ public class MapsActivity extends FragmentActivity {
         OsmC = (MapController) mMap.getController();
         OsmC.setZoom(500);
 
-        OsmC.animateTo(uniCenter);
 
-        AddYou();
+
+        // My Location Overlay
+        final MyLocationNewOverlay locationOverlay = new MyLocationNewOverlay(mMap);
+        locationOverlay.enableMyLocation();
+        locationOverlay.setDrawAccuracyEnabled(true);
+
+        locationOverlay.runOnFirstFix( new Runnable(){
+            @Override
+            public void run() {
+                OsmC.animateTo(uniCenter);
+            }
+        });
+
+        mMap.getOverlays().add(locationOverlay);
+
+        /*AddYou();*/
         GetMarkersDB();
     }
 

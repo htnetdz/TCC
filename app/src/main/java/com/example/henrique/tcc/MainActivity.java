@@ -168,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             }
             else if (userType.equalsIgnoreCase("comum")) {
                 Log.d("loginuichanges comum","");
-                adminButton.setVisibility(View.VISIBLE);
+                adminButton.setVisibility(View.INVISIBLE);
                 //TESTES, TIRAR
                 adminButton.setOnClickListener(new View.OnClickListener(){
                     public void onClick (View v){
@@ -176,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
                         startActivity (i);
                     }
                 });
-                adminHelp.setVisibility(View.VISIBLE);
+                adminButton.invalidate();
+                adminHelp.setVisibility(View.INVISIBLE);
                 userButton.setVisibility(View.VISIBLE);
                 adminHelp.invalidate();
                 userHelp.invalidate();
-                adminButton.invalidate();
                 userButton.setVisibility(View.VISIBLE);
                 userButton.setOnClickListener(new View.OnClickListener(){
                     public void onClick (View v){

@@ -29,6 +29,12 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -97,10 +103,11 @@ public class UserNotificationJob extends JobService {
                 JsonElement parsedResponse = new JsonParser().parse(response);
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
 
-                if (dataObject.isJsonArray()) {
+                if (dataObject.isJsonObject()) {
                     notificationJSON = dataObject.getAsJsonArray("data");
 
                     List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
+                    Log.d("notifList", unreadNotifications.toString());
 
                     if (unreadNotifications.isEmpty() == false) {
                         for (NotificationObject notificationToProcess : unreadNotifications) {
