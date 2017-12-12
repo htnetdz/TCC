@@ -40,6 +40,8 @@ public class UserListActivity extends AppCompatActivity {
     private RequestQueue requestQueue;
     private Gson gson;
     private int currentUser;
+    private List<Problem> problems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,133 +85,23 @@ public class UserListActivity extends AppCompatActivity {
 
     }
 
-    public List<Problem> filterList (List<Problem> listToFilter, int mode, int user){
-        List<Problem> resultList = new List<Problem>() {
-            @Override
-            public int size() {
-                return 0;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return false;
-            }
-
-            @NonNull
-            @Override
-            public Iterator<Problem> iterator() {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public Object[] toArray() {
-                return new Object[0];
-            }
-
-            @NonNull
-            @Override
-            public <T> T[] toArray(@NonNull T[] a) {
-                return null;
-            }
-
-            @Override
-            public boolean add(Problem problem) {
-                return false;
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                return false;
-            }
-
-            @Override
-            public boolean containsAll(@NonNull Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(@NonNull Collection<? extends Problem> c) {
-                return false;
-            }
-
-            @Override
-            public boolean addAll(int index, @NonNull Collection<? extends Problem> c) {
-                return false;
-            }
-
-            @Override
-            public boolean removeAll(@NonNull Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public boolean retainAll(@NonNull Collection<?> c) {
-                return false;
-            }
-
-            @Override
-            public void clear() {
-
-            }
-
-            @Override
-            public Problem get(int index) {
-                return null;
-            }
-
-            @Override
-            public Problem set(int index, Problem element) {
-                return null;
-            }
-
-            @Override
-            public void add(int index, Problem element) {
-
-            }
-
-            @Override
-            public Problem remove(int index) {
-                return null;
-            }
-
-            @Override
-            public int indexOf(Object o) {
-                return 0;
-            }
-
-            @Override
-            public int lastIndexOf(Object o) {
-                return 0;
-            }
-
-            @NonNull
-            @Override
-            public ListIterator<Problem> listIterator() {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public ListIterator<Problem> listIterator(int index) {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public List<Problem> subList(int fromIndex, int toIndex) {
-                return null;
-            }
-        };
-
+    public void filterList (List<Problem> listToFilter, int mode, int user){
+        List<Problem> resultList = new ArrayList<Problem>();
         //Filtering by vote, not by problems created by the user
-       if (mode == 1) {
-           if (!(listToFilter.isEmpty())) {
+       if (mode == 0){
+
+           if (listToFilter.isEmpty() == false) {
+               for (Problem problem : listToFilter) {
+
+                   if (problem.usuario_id == user)
+                       resultList.add(problem);
+
+               }
+           }
+       }
+
+        if (mode == 1) {
+           if (listToFilter.isEmpty() == false) {
                for (Problem problem : listToFilter) {
 
                    if (problem.usuario_id != user)
@@ -219,13 +111,27 @@ public class UserListActivity extends AppCompatActivity {
            }
        }
 
+        Log.d ("Lista filtrada", resultList.toString());
+        final ListView problemList = (ListView) findViewById(R.id.User_Report_List);
 
-        return resultList;
+        ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(), 0, resultList);
+        problemList.setAdapter(adapter);
+        problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Object listItem = problemList.getItemAtPosition(position);
+                Log.d("clicando", listItem.toString());
+
+            }
+        });
+
+
     }
 
-    public void buildProblemList(int userId, int mode){
-        final int filterMode = mode;
-        final int filterId = userId;
+    public void buildProblemList(final int userId, int mode){
+
+        final int modeFilter = mode;
+        final int userFilter = userId;
         String endpoint = "http://104.236.55.88:8000/api/problemas/usuario/";
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
             @Override
@@ -235,31 +141,10 @@ public class UserListActivity extends AppCompatActivity {
                 JsonElement parsedResponse = new JsonParser().parse(response);
                 JsonObject dataObject = parsedResponse.getAsJsonObject();
                 JsonArray dataArray = dataObject.getAsJsonArray("data");
-                List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
-                List<Problem> filteredProblems = problems;
+                problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
+                filterList(problems, modeFilter, userId);
 
-                if (filterMode !=0) {
-                    Log.d("Filtrando","");
-                  filteredProblems = filterList(problems, filterMode, filterId);
-                }
 
-                final ListView problemList = (ListView) findViewById(R.id.User_Report_List);
-                if (filteredProblems != null) {
-                    Log.d("filtrado", filteredProblems.toString());
-                    ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(), 0, filteredProblems);
-                    problemList.setAdapter(adapter);
-                    problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Object listItem = problemList.getItemAtPosition(position);
-                            Log.d("clicando", listItem.toString());
-
-                        }
-                    });
-                }
-                else{
-                    problemList.setAdapter(null);
-                }
             }
         }, new Response.ErrorListener() {
             @Override
