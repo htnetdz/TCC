@@ -62,15 +62,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/*Classe responsável pelo carregamento e exibição do mapa, principal funcionalidade do sistema*/
 public class MapsActivity extends FragmentActivity {
 
-    private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
-    private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
     private MapView mMap;
     private MapController OsmC;
-    private FusedLocationProviderClient locationClient;
-    private RequestQueue requestQueue;
+     private RequestQueue requestQueue;
     private Gson gson;
     private FusedLocationProviderClient mFusedLocationClient;
     private int id;
@@ -85,8 +82,9 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps_test);
 
+        //O botão de adicionar problema deve ser exibido apenas a usuários comuns
         final Button addProblemButton = (Button) findViewById(R.id.addProblem);
-        if (id !=0){
+        if (id !=0 && settings.getString("userType", "").equalsIgnoreCase("comum")){
             addProblemButton.setVisibility(View.VISIBLE);
         }
         addProblemButton.setOnClickListener(new View.OnClickListener() {
@@ -109,132 +107,25 @@ public class MapsActivity extends FragmentActivity {
 
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    return;
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-            case MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    PrepareMap();
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
-
-    public void CheckConnections(){
-
-
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo netStatus = manager.getActiveNetworkInfo();
-        LocationManager gpsStatus = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-
-        //Checando e pedindo por GPS
-        if(!gpsStatus.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            //Diálogo para pedir GPS
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Falta de GPS");
-            builder.setMessage("O GPS parece estar desligado, é necessário ativar para que o mapa seja carregado");
-            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //Mostra as configurações para que o usuário possa habililtar o GPS
-                    Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                    startActivity(i);
-                }
-            });
-            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            builder.create().show();
-        }
-
-
-
-        else if(netStatus == null || !(netStatus.isConnectedOrConnecting()))
-        {
-            //Diálogo Para Avisar o Usuário de falta de internet
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Sem Internet");
-            builder.setMessage("O Wifi parece estar desligado, é necessário ativar para que o mapa seja carregado");
-            builder.setPositiveButton("Ativar", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    //Mostra as configurações para que o usuário possa habililtar o GPS
-                    Intent i = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                    startActivity(i);
-                }
-            });
-            builder.setNegativeButton("Agora Não", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            builder.create().show();
-        }
-
-
-    }
-
+    //
     public void PrepareMap() {
 
         final GeoPoint uniCenter = new GeoPoint(-22.3492696, -49.0326935);
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        //Instanciando a MapView
         mMap = (MapView) findViewById(R.id.mapaPrincipal);
-
-        /*final float scale = getResources().getDisplayMetrics().density;
-        final int newScale = (int) (256 * scale);
-        String[] OSMSource = new String[2];
-        OSMSource[0] = "http://a.tile.openstreetmap.org/";
-        OSMSource[1] = "http://b.tile.openstreetmap.org/";
-        XYTileSource MapSource = new XYTileSource(
-                "OSM",
-                null,
-                1,
-                18,
-                newScale,
-                ".png",
-                OSMSource
-        );*/
-
         mMap.setTileSource(TileSourceFactory.MAPNIK);
-
         mMap.setMaxZoomLevel(18);
         mMap.setMinZoomLevel(16);
         mMap.setBuiltInZoomControls(false);
         mMap.setMultiTouchControls(true);
 
+        //Instanciando o MapController
         OsmC = (MapController) mMap.getController();
         OsmC.setZoom(500);
 
-
-
-        // My Location Overlay
+        // My Location Overlay, para atualizar a localização em tempo real
         final MyLocationNewOverlay locationOverlay = new MyLocationNewOverlay(mMap);
         locationOverlay.enableMyLocation();
         locationOverlay.setDrawAccuracyEnabled(true);
@@ -248,44 +139,27 @@ public class MapsActivity extends FragmentActivity {
 
         mMap.getOverlays().add(locationOverlay);
 
-        /*AddYou();*/
         GetMarkersDB();
     }
 
-    public void AddYou() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        mFusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                    @Override
-                    public void onSuccess(Location location) {
-                        // Got last known location. In some rare situations this can be null.
-                        if (location != null) {
-                            GeoPoint startPoint = new GeoPoint(location.getLatitude(), location.getLongitude());
-                            /*OsmC.animateTo(startPoint);*/
-                            AddMarker(startPoint, null, 0);
-                        }
-                    }
-                });
-
-    }
-
-
+    /* Função que adiciona um marcador por vez, associando eles a um índice no overlay
+     * de marcadores, e a um problema para que o objeto de detalhes consiga carregar informações
+     * ao clique do usuário*/
     public void AddMarker(GeoPoint ponto, Problem problemToMark, int index){
-       /* Marker newMarker = new Marker(mMap);*/
-        ProblemMarker newMarker = new ProblemMarker(mMap);
 
-        /*Populating the marker with information to pass*/
+        //Objetos ProblemMarker estão descritos em ProblemMarker.java, possui
+        ProblemMarker newMarker = new ProblemMarker(mMap);
         newMarker.setPosition(ponto);
         newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
-
+        //O ìndice 0 deve ser sempre o marcador de posição atual
         Resources res = getResources();
         if (index == 0){
             newMarker.setIcon(res.getDrawable(R.drawable.person));
             newMarker.setInfoWindow(null);
         }
+        //Outros índices indicam marcadores de problema, então precisam ser populados com
+        // informações de problemas
         else {
             newMarker.setProblemTitle(problemToMark.titulo);
             newMarker.setIcon(res.getDrawable(R.drawable.ic_place_black_24dp));
@@ -314,24 +188,35 @@ public class MapsActivity extends FragmentActivity {
 
     }
 
+    //Função que usará componentes do Volley para fazer um request ao serviço
+    private void fetchProblems(String endpoint){
+        StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
+        requestQueue.add(request);
+    }
+
+    /*Adiciona o problema em si ao banco de dados no backend*/
     public void addProblemDB(final Problem problemToAdd){
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+
+        //Tenativa de ler a última localização do sistema
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(final Location location) {
-                        // Got last known location. In some rare situations this can be null.
+
+                        //Em caso de sucesso, montar a requisição
                         if (location != null) {
                             String endpoint = "http://104.236.55.88:8000/api/problema"; //ENDPOINT
-
                             StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
                                 @Override
                                 public void onResponse(String response) {
                                     Log.d("RESPOSTA POST", response.toString());
+                                    //No caso de sucesso da resposta, pegar marcadores novamente
                                     GetMarkersDB();
+
                                 }
                             }, new Response.ErrorListener() {
                                 @Override
@@ -340,6 +225,7 @@ public class MapsActivity extends FragmentActivity {
                                 }
                             }){
                                 @Override
+                                //Parâmetros da requisição
                                 protected Map<String,String> getParams(){
                                     Map<String,String> params = new HashMap<String, String>();
                                     params.put("usuario_id", String.valueOf(id));
@@ -353,6 +239,7 @@ public class MapsActivity extends FragmentActivity {
                                 }
 
                                 @Override
+                                //Headers da requisição, é necessária a chave de usuário
                                 public Map<String, String> getHeaders() throws AuthFailureError {
                                     Map<String,String> params = new HashMap<String, String>();
                                     params.put("Accept","application/json");
@@ -371,11 +258,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
 
-    //Função que usará componentes do Volley para fazer um request ao serviço
-    private void fetchProblems(String endpoint){
-        StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
-        requestQueue.add(request);
-    }
+
 
     //Callback de fetchProblems, caso dê tudo certo
     private final Response.Listener<String> onProblemsLoaded = new Response.Listener<String>() {
@@ -389,13 +272,13 @@ public class MapsActivity extends FragmentActivity {
             JsonObject dataObject = parsedResponse.getAsJsonObject();
             JsonArray dataArray = dataObject.getAsJsonArray("data");
 
-            /*chamar a função de adicionar marcador para cada ponto encontrado*/
+
             List<Problem> problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
             int index = 1;
             if (!(problems.isEmpty())) {
                 for (Problem problem : problems) {
-
+                    /*chamar a função de adicionar marcador para cada ponto encontrado*/
                     Log.d("problema", String.valueOf(problem.lat) + ' ' + String.valueOf(problem.lon) + "\nDescrição " + problem.descricao);
                     point = new GeoPoint(problem.lat, problem.lon);
                     AddMarker(point, problem, index);
@@ -423,6 +306,7 @@ public class MapsActivity extends FragmentActivity {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MapsActivity.this);
         alertDialogBuilder.setView(promptView);
 
+        //Spinner de tipos, o índice escolhido determina qual o tipo de probçema
         final Spinner typeSpinner = (Spinner) promptView.findViewById(R.id.selectorTypes);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.problem_types_array, android.R.layout.simple_spinner_item);
@@ -444,7 +328,6 @@ public class MapsActivity extends FragmentActivity {
                         newProblem.tipo_problema_id = (typeSpinner.getSelectedItemPosition())+1;
 
                         addProblemDB(newProblem);
-//                        dialog.cancel();
                     }
                 })
                 .setNegativeButton("Cancelar",

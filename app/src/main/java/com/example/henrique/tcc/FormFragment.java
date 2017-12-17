@@ -10,6 +10,7 @@ import android.view.ViewGroup;
  * Created by Henrique on 07/07/2017.
  */
 
+/*Classe responsável pela exibição do diálogo para adicionar problema */
 public class FormFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

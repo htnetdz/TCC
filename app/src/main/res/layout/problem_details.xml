@@ -89,15 +89,25 @@
             android:textStyle="bold"
             android:visibility="invisible" />
 
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
         <Button
             android:id="@+id/resolver_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:backgroundTint="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
-            android:text="Resolvido!"
+            android:text="Resolver"
             android:textAlignment="center"
             android:visibility="invisible" />
+
+        <Space
+            android:layout_width="5dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/detailsVotesDown"

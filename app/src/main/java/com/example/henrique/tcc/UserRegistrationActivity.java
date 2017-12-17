@@ -23,7 +23,8 @@ import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/*Classe responsável por processar o registro de usuário
+* Ao contrário da atividade de Login, não é baseada numa atividade pronta do Android Studio*/
 public class UserRegistrationActivity extends AppCompatActivity {
 
     private RequestQueue requestQueue;
@@ -40,7 +41,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                //Cada campo do formulátio é uma String deste vetor
                 String[] inputForm = new String[5];
                 final TextView userNameField = (TextView) findViewById(R.id.userNameField);
                 final TextView realNameField = (TextView) findViewById(R.id.realNameField);
@@ -62,8 +63,9 @@ public class UserRegistrationActivity extends AppCompatActivity {
 
 
     }
-
+    //Função que de fato realiza a requisição
     public void sendUser (final String[] userData )  {
+        //Rota da requisição
         String endpoint = "http://104.236.55.88:8000/api/usuarios";
         requestQueue = Volley.newRequestQueue(getApplicationContext());
         StringRequest request = new StringRequest(Request.Method.POST, endpoint, new Response.Listener<String>(){
@@ -84,7 +86,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
 
             }
         }){
-
+        //Parâmetros da requisição
             @Override
             protected Map<String,String> getParams(){
                 Map<String,String> params = new HashMap<String, String>();
@@ -94,7 +96,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
                 params.put("password", userData[3]);
                 return params;
             }
-
+            //Header da Requisição, rota não protegida
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();
@@ -105,7 +107,7 @@ public class UserRegistrationActivity extends AppCompatActivity {
         requestQueue.add(request);
 
     }
-
+//Função que limpa o formulario em caso de sucesso
     public void clearForm(){
         TextView userNameField = (TextView) findViewById(R.id.userNameField);
         TextView realNameField = (TextView) findViewById(R.id.realNameField);

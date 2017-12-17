@@ -199,7 +199,8 @@
                     android:text="Tipo Mais Cadastrado"
                     android:textAlignment="center"
                     android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:visibility="invisible"/>
 
                 <Space
                     android:layout_width="15sp"
@@ -213,7 +214,8 @@
                     android:layout_weight="1"
                     android:text="TextView"
                     android:textAlignment="center"
-                    android:textSize="18sp" />
+                    android:textSize="18sp"
+                    android:visibility="invisible"/>
 
             </LinearLayout>
 

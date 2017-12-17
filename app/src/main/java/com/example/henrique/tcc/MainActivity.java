@@ -28,10 +28,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-
+/*Atividade principal, rodando assim que o aplicativo é carregado*/
 public class MainActivity extends AppCompatActivity {
 
+    //Instância de SharedPreferences para consultar usuário logado anteriormente
     private SharedPreferences settings;
+
+    //Constantes para os pedidos de permissão do sistema
     private static final int MY_PERMISSIONS_REQUEST_WRITE_EXTERNAL_STORAGE = 1;
     private static final int MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 2;
 
@@ -42,11 +45,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         settings = getSharedPreferences("gisUnespSettings", 0);
 
-        Log.d("Prefeituras", settings.getAll().toString());
         TextView topText = (TextView) findViewById(R.id.sample_text);
+        //Define o texto de boas vindas caso o usuário esteja logado anteriormente
         topText.setText("Bem vindo "+settings.getString("userName","ao GISUnesp"));
 
         Button loginButton = (Button) findViewById(R.id.loginButton);
+
+        //Se há usuário logado ou não, exibir os botões apropriados
         if (settings.getInt("userId", 0) == 0){
             logOutUiChanges();
         }
@@ -54,12 +59,11 @@ public class MainActivity extends AppCompatActivity {
             logInUiChanges();
         }
 
+    //As permissões e conexões devem estar me ordem para exibir o mapa
     Button mapButton = (Button) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
-                /*Intent i = new Intent(getApplicationContext(), MapsActivity.class);
-                startActivity (i);*/
-               CheckPermissionMain();
+                CheckPermissionMain();
             }
         });
 
@@ -71,14 +75,11 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-//    // Example of a call to a native method
-//    TextView tv = (TextView) findViewById(R.id.sample_text);
-//    tv.setText(stringFromJNI());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
+    //Depois de receber a resposta de Login, ajustar interface e registrar job de notificações
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK){
@@ -90,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    /*Manipula uma instância de JobInfo que usará uma instância da classe UserNotificationJob
+     * para processar as notificações do sistema, geradas pelas interações de outros usuários */
     public void registerJob (){
 
 
@@ -99,8 +102,7 @@ public class MainActivity extends AppCompatActivity {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
 
             JobInfo jobInfo =  new JobInfo.Builder(1,componentName)
-                    /*.setPeriodic(180000)*/
-                    .setPeriodic(10000)
+                    .setPeriodic(180000)
                     .setBackoffCriteria(3000, JobInfo.BACKOFF_POLICY_LINEAR)
                     .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                     .build();
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("On Resume", settings.getAll().toString());
 
+        //Qaundo a Tela Principal é recarregada, deve-se checar o usuário para ajusta-la
         TextView topText = (TextView) findViewById(R.id.sample_text);
         Typeface face=Typeface.createFromAsset(getAssets(),"fonts/SwissBold.ttf");
         topText.setTypeface(face);
@@ -128,29 +131,36 @@ public class MainActivity extends AppCompatActivity {
             logInUiChanges();
     }
 
+    //Função usada para parar o job criado, assim que o usuário fizer logout
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void unregisterJob(){
         JobScheduler jobScheduler = (JobScheduler) getApplicationContext().getSystemService(JOB_SCHEDULER_SERVICE);
         jobScheduler.cancel(1);
     }
 
+    //Chamada sempre que a interface precisa mudar baseada no usuário logado
     public void logInUiChanges(){
 
         setContentView(R.layout.activity_main);
+
+        //Mudar texto do botão de login
         Button loginButton = (Button) findViewById(R.id.loginButton);
         loginButton.setText("Log Out");
         String userType = settings.getString("userType", "");
         Log.d("tipousuario", userType);
+
+        //Botões usados apenas por usuário logados
         Button adminButton = (Button) findViewById(R.id.adminButton);
         TextView adminHelp = (TextView) findViewById(R.id.adminAreaButtonHelp);
         Button userButton = (Button) findViewById(R.id.userButton);
         TextView userHelp = (TextView) findViewById(R.id.userAreaButtonHelp);
 
         boolean userState = userType.equalsIgnoreCase("comum");
-        Log.d("userState", String.valueOf(userState));
-
+            //Se usuário é administrados
             if (userType.equalsIgnoreCase("admin")) {
                 Log.d("loginuichanges admin","");
+
+                //Botão da área do administrador deve estar disponível
                 adminButton.setVisibility(View.VISIBLE);
                 adminButton.setOnClickListener(new View.OnClickListener(){
                     public void onClick (View v){
@@ -160,24 +170,24 @@ public class MainActivity extends AppCompatActivity {
                 });
                 adminHelp.setVisibility(View.VISIBLE);
                 adminButton.invalidate();
+
+                //Botão da área de usuário comum deve estar indisponível
                 userButton.setVisibility(View.INVISIBLE);
                 adminHelp.invalidate();
                 userHelp.setVisibility(View.INVISIBLE);
                 userHelp.invalidate();
                 userButton.invalidate();
             }
+            //Se usuário é do tipo comum
             else if (userType.equalsIgnoreCase("comum")) {
                 Log.d("loginuichanges comum","");
+
+                //Botão de área do administrador deve estar indusponível
                 adminButton.setVisibility(View.INVISIBLE);
-                //TESTES, TIRAR
-                adminButton.setOnClickListener(new View.OnClickListener(){
-                    public void onClick (View v){
-                        Intent i = new Intent(getApplicationContext(), AdminActivity.class);
-                        startActivity (i);
-                    }
-                });
                 adminButton.invalidate();
                 adminHelp.setVisibility(View.INVISIBLE);
+
+                //Botão de área do usuário deve estar disponível
                 userButton.setVisibility(View.VISIBLE);
                 adminHelp.invalidate();
                 userHelp.invalidate();
@@ -191,6 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 userButton.invalidate();
             }
 
+        //Botão de mapa sempre deve estar com sua chamada correta
         Button mapButton = (Button) findViewById(R.id.mapButton);
         mapButton.setOnClickListener(new View.OnClickListener(){
             public void onClick (View v){
@@ -214,8 +225,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    //Ao fazer logout, chamar esta função
     public void logOutUiChanges(){
 
+        //Editar as preferências, tornar tudo nulo
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("userName", null);
         editor.putString("userToken", null);
@@ -227,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
         TextView adminHelp = (TextView) findViewById(R.id.adminAreaButtonHelp);
         TextView userHelp = (TextView) findViewById(R.id.userAreaButtonHelp);
 
+        //Cancelar o job de notificações
         unregisterJob();
 
 
@@ -240,6 +254,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        //Tornar os botões que necessitam de autenticação invisíveis, e mudar o texto de bem vindo
         Button adminButton = (Button) findViewById(R.id.adminButton);
         Button userButton = (Button) findViewById(R.id.userButton);
         adminButton.setVisibility(View.INVISIBLE);
@@ -250,15 +265,19 @@ public class MainActivity extends AppCompatActivity {
         userHelp.invalidate();
         adminHelp.setVisibility(View.INVISIBLE);
         adminHelp.invalidate();
+        TextView topText = (TextView) findViewById(R.id.sample_text);
+        topText.setText("Bem vindo ao GISUnesp");
 
     }
 
+    //O mapa não deve ser carregado sem as devidas permissões
     private void CheckPermissionMain(){
+
+        //Checando permissão de armazenamento, para o cache das tiles do mapa
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
 
@@ -273,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
+        //Permissões de acesso a localização
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -297,6 +316,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
+    //O mapa necessita de rede e GPS para ser carregado, esta função checa ambos
     private void CheckConnectionsMain(){
 
 
@@ -327,6 +348,7 @@ public class MainActivity extends AppCompatActivity {
             builder.create().show();
         }
 
+        //Checando por conexão com a internet
         else if (netStatus == null || !(netStatus.isConnectedOrConnecting()))
         {
             //Diálogo Para Avisar o Usuário de falta de internet

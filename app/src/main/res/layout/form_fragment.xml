@@ -10,6 +10,20 @@
     android:weightSum="1">
 
     <TextView
+        android:id="@+id/userWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="O novo relato será adicionado a sua posição local"
+        android:textAlignment="center"
+        android:textColor="@android:color/holo_red_dark"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10sp" />
+
+    <TextView
         android:id="@+id/problemTitleHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

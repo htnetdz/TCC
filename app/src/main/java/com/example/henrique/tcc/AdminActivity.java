@@ -32,6 +32,7 @@ import com.google.gson.JsonParser;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,7 +43,8 @@ public class AdminActivity extends AppCompatActivity {
     private List<Problem> problems;
     private String callingList;
 
-
+    /*Classe responsável pelo controle do conteúdo e aparência
+    * da view activity_admin.xml, que contém content_admin.xml*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,6 +67,7 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        //Botão para mostrar relatórios
         final Button showDataButton = (Button) findViewById(R.id.reportsButton);
         showDataButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +76,10 @@ public class AdminActivity extends AppCompatActivity {
             }
         });
 
+        //Inicialização de fila de requisições Volley
         requestQueue = Volley.newRequestQueue(this);
+
+        //Incialização de Builder JSON para organização de respostas
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
         problems = null;
@@ -82,16 +88,22 @@ public class AdminActivity extends AppCompatActivity {
 
     }
 
+    /* Função que ativa a troca de views no ViewSwitcher, presente
+     em  content_admin.xml */
     public void swapList (String viewToShow){
+        //Instância de ViewSwitcher, só pode suportar duas views internas
         ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.adminviewswitcher);
 
+        //Checagem de qual view está sendo exibida
         if (viewToShow.equalsIgnoreCase("problems")) {
+            //Se é a view errada, trocar.
             if (switcher.getCurrentView() == findViewById(R.id.reportsLayout)) {
                 Log.d("listaproblemas", "in");
                 switcher.showPrevious();
             }
         }
         if (viewToShow.equalsIgnoreCase("reports")) {
+            //Se é a view errada, trocar.
             if (switcher.getCurrentView() == findViewById(R.id.problemList)) {
                 Log.d("relatorios", "in");
                 switcher.showNext();
@@ -101,10 +113,21 @@ public class AdminActivity extends AppCompatActivity {
 
     }
 
+
+    /* Conta dados a partir da lista problems, construída na função BuildList()  */
     public void generateData () {
+
+        /*O tamanho da lista de problemas representa quantos problemas estão
+        cadastrados no sistema*/
         int totalProblems = problems.size();
+
+        //Número de problemas
         int numberSolved= 0;
+
+        //Há quatro tipos de problemas, por enquanto, por isso um vetor de inteiros conta cada tipo
         int[] types = {0,0,0,0};
+
+        //Qual o índice do vetor de tipos tem o maior número
         int maxType = 0;
 
         for (Problem eachProblem : problems){
@@ -132,8 +155,9 @@ public class AdminActivity extends AppCompatActivity {
 
         total.setText(String.valueOf(totalProblems));
         solved.setText(String.valueOf(numberSolved));
-        solvedPercent.setText("("+String.valueOf(percent)+"%"+")");
+        solvedPercent.setText("("+new BigDecimal(String.valueOf(percent)).setScale(2, BigDecimal.ROUND_HALF_UP)+"%"+")");
 
+        //Definindo o tipo máximo no relatório
         /*if (maxType ==0){
             type.setText("Acesso");
         }
@@ -149,9 +173,12 @@ public class AdminActivity extends AppCompatActivity {
 
     }
 
+    /*Popula de maneira já ordenada a ListView em content_admin.xml */
     public void BuildList (String orderBy){
         ListView problemList = (ListView) findViewById(R.id.problemList);
         problemList.setAdapter(null);
+
+        //Definição de qual endpoint usar na requisição
         String endpoint = null;
         if (orderBy == "votes"){
             callingList = "problems";
@@ -161,9 +188,11 @@ public class AdminActivity extends AppCompatActivity {
             callingList = "problems";
             endpoint = "http://104.236.55.88:8000/api/problemas?order_antigos=true";
         }
+
         fetchProblems(endpoint);
     }
 
+    /* Criação da requisição em si */
     private void fetchProblems(String endpoint){
         //Método GET usado como exemplo, suporta outros
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, onProblemsLoaded, onFetchError);
@@ -181,9 +210,11 @@ public class AdminActivity extends AppCompatActivity {
             JsonObject dataObject = parsedResponse.getAsJsonObject();
             JsonArray dataArray = dataObject.getAsJsonArray("data");
 
-            /*chamar a função de adicionar marcador para cada ponto encontrado*/
+            /* Criar a lista de problemas completa, a partir da classe Problem e da resposta*/
             problems = Arrays.asList(gson.fromJson(dataArray, Problem[].class));
             ListView problemList = (ListView) findViewById(R.id.problemList);
+
+            // Cria e associa à lisa um adapter para mostrar os elementos da mesma
             ProblemAdapter adapter = new ProblemAdapter(getApplicationContext(),0, problems);
             problemList.setAdapter(adapter);
             problemList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -196,9 +227,11 @@ public class AdminActivity extends AppCompatActivity {
             Log.d("Adapter status", adapter.toString());
             Log.d("Lista de problemas", String.valueOf(problems.isEmpty()));
 
+            //Caso há problemas cadastrados, gerar relatórios
             if(problems.isEmpty() == false)
                 generateData();
 
+            //Trocar para o view da lista
             swapList(callingList);
 
         }

@@ -1,9 +1,11 @@
 package com.example.henrique.tcc;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.AsyncTask;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -107,13 +110,16 @@ public class UserNotificationJob extends JobService {
                     notificationJSON = dataObject.getAsJsonArray("data");
 
                     List<NotificationObject> unreadNotifications = Arrays.asList(gson.fromJson(notificationJSON, NotificationObject[].class));
-                    Log.d("notifList", unreadNotifications.toString());
 
+
+                    Log.d("notifList", unreadNotifications.toString());
                     if (unreadNotifications.isEmpty() == false) {
                         for (NotificationObject notificationToProcess : unreadNotifications) {
                             notifyUser(notificationToProcess);
                         }
                     }
+
+
                 }
             }
         };
@@ -168,11 +174,17 @@ public class UserNotificationJob extends JobService {
                 mensagem = "como resolvido";
             }
 
+            Intent notifIntent = new Intent(getApplicationContext(),  UserListActivity.class);
+            PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, notifIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
             NotificationCompat.Builder mBuilder =
                     new NotificationCompat.Builder(getApplicationContext())
                             .setSmallIcon(R.drawable.ic_priority_high_black_24dp)
                             .setContentTitle("Confirmação")
-                            .setContentText("Seu relato foi votado "+mensagem+"!");
+                            .setContentText("Seu relato foi votado "+mensagem+"!")
+                            .setContentIntent(contentIntent);
+
             NotificationManager mNotificationManager =
                     (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             mNotificationManager.notify(notification.data.confirmacao_id, mBuilder.build());

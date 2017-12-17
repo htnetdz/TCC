@@ -58,9 +58,11 @@ import java.util.Map;
 
 import static android.Manifest.permission.READ_CONTACTS;
 
-/**
- * A login screen that offers login via email/password.
- */
+
+
+/*Classe LoginActivity presente nas atividades padrões do Android Studio
+* levemente modificada para suprir as necessidades do sistema*/
+
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
 
     /**
@@ -340,6 +342,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mEmail = email;
             mPassword = password;
             GsonBuilder gsonBuilder = new GsonBuilder();
+
+            //Instâncias das ferramentas para requisição e processamento de JSON
             gson = gsonBuilder.create();
             requestQueue = Volley.newRequestQueue(getApplicationContext());
 
@@ -356,15 +360,20 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 @Override
                 public void onResponse(String response) {
 
-                    Log.d("fantasy", response.toString());
+                    //Caso o login tenha sucesso, processar o JSON
                     JsonElement parsedResponse = new JsonParser().parse(response);
                     JsonObject dataObject = parsedResponse.getAsJsonObject();
                     JsonObject dataArray  = dataObject.getAsJsonObject("data");
 
+                    //Usar a classe UserInfo para acomodar os campos da resposta
                     UserInfo loggedUser = gson.fromJson(dataArray, UserInfo.class);
                     Log.d("USER INFO", loggedUser.toString());
+
+                    //Instância de SharedPreferences para guardar as informação do usuário
                     SharedPreferences settings = getSharedPreferences("gisUnespSettings", 0);
                     SharedPreferences.Editor editor = settings.edit();
+
+                    //Editando as preferências para referência futura em outras classes
                     editor.putInt("userId", loggedUser.id);
                     editor.putString("userName", loggedUser.name);
                     editor.putString("userType",loggedUser.tipo);
@@ -378,7 +387,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             }){
                 @Override
-
+                //Parâmetros necessários para a requisição
                 protected Map<String,String> getParams(){
                     Map<String,String> params = new HashMap<String, String>();
                     params.put("email", mEmail);
@@ -386,6 +395,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     return params;
                 }
 
+                //Headers necessários para a requisição
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     Map<String,String> params = new HashMap<String, String>();

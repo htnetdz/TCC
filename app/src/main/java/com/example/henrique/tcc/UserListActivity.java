@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+/*Classe responsável pela tela de usuário, exibindo e montando as listas necessárias
+* Muito parecida com a classe AdminActivity*/
 public class UserListActivity extends AppCompatActivity {
 
     private SharedPreferences settings;
@@ -58,6 +60,8 @@ public class UserListActivity extends AppCompatActivity {
         gson = gsonBuilder.create();
         buildProblemList(currentUser, 0);
 
+        /*Os botões Relatos e Votos da interface devem abrir a mesma view, porém filtradas de
+        * maneiras diferentes, usando o ProblemAdapter*/
         final Button reportsButton = (Button) findViewById(R.id.reportsButton);
         reportsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,6 +78,8 @@ public class UserListActivity extends AppCompatActivity {
             }
         });
 
+        /*O botão de notificações deve montar a view como uma lista diferente, usando
+        o NotifAdapter*/
         final Button notifsButton = (Button) findViewById(R.id.notificationsButton);
         notifsButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,11 +91,13 @@ public class UserListActivity extends AppCompatActivity {
 
     }
 
+    //Filtra a lista dada
     public void filterList (List<Problem> listToFilter, int mode, int user){
         List<Problem> resultList = new ArrayList<Problem>();
         //Filtering by vote, not by problems created by the user
        if (mode == 0){
-
+            /*Se um problema não foi criado pelo usuário logado, porém está nesta lista,
+            representa um voto, não um relato*/
            if (listToFilter.isEmpty() == false) {
                for (Problem problem : listToFilter) {
 
@@ -132,6 +140,8 @@ public class UserListActivity extends AppCompatActivity {
 
         final int modeFilter = mode;
         final int userFilter = userId;
+        //Esta requisição pede pelo Problem de cada NotificationInfo, via problema_id
+        //Popula o título do problema
         String endpoint = "http://104.236.55.88:8000/api/problemas/usuario/";
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
             @Override
@@ -152,7 +162,7 @@ public class UserListActivity extends AppCompatActivity {
 
             }
         }){
-
+        //Headers da requisição, rota protegida
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();
@@ -165,6 +175,7 @@ public class UserListActivity extends AppCompatActivity {
         requestQueue.add(request);
     }
 
+    //Requisição neste caso é um método GET, sem parâmetros, o usuário está contido na Token
     public void buildNotifList(){
         String endpoint = "http://104.236.55.88:8000/api/usuario/notificacoes";
         StringRequest request = new StringRequest(Request.Method.GET, endpoint, new Response.Listener<String>(){
@@ -218,6 +229,7 @@ public class UserListActivity extends AppCompatActivity {
             }
         }){
 
+            //Header da requisição
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String,String> params = new HashMap<String, String>();

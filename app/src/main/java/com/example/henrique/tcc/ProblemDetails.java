@@ -86,11 +86,16 @@ public class ProblemDetails extends MarkerInfoWindow {
                 userQuery.setText("Este problema foi mesmo resolvido?");
                 problemStatus.setText("RESOLVIDO");
                 problemStatus.setTextColor(Color.parseColor("#ff669900"));
+
+
             }
             else{
                 userQuery.setText("Este relato está correto?");
                 problemStatus.setText("PENDENTE");
                 problemStatus.setTextColor(Color.parseColor("#ffcc0000"));
+
+
+
             }
             voteCountUp.setText(valueOf(toUpdate[0].votos_pos));
             voteCountDown.setText(valueOf(toUpdate[0].votos_neg));
@@ -155,7 +160,16 @@ public class ProblemDetails extends MarkerInfoWindow {
         solvedBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Button solveButton = (Button) mView.findViewById(R.id.resolver_button);
+                TextView solvedText = (TextView) mView.findViewById(R.id.solvedDesc);
                 solveProblem(attachedMarker.problemId);
+                getProblem(attachedMarker.problemId);
+                if (solvedText.getText().toString().equalsIgnoreCase("pendente")){
+                    solveButton.setText("Resolver");
+                }
+                else{
+
+                }
             }
         });
     }

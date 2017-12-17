@@ -32,7 +32,8 @@ import java.util.Map;
 /**
  * Created by Henrique on 10/12/2017.
  */
-
+/* Classe responsável por criar as notificações na lista do usuário
+* */
 public class NotifAdapter extends ArrayAdapter<NotificationInfo>{
 
     private String title;
